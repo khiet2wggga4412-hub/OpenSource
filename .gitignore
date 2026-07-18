@@ -1,6 +1,10 @@
 # Android Studio / IntelliJ IDEA
 .idea/
 *.iml
+captures/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
 
 # Gradle and Kotlin caches
 .gradle/
@@ -16,6 +20,7 @@ local.properties
 *.aab
 *.ap_
 *.dex
+output-metadata.json
 
 # Native build outputs (kept here in case native code is added separately)
 .cxx/
@@ -27,9 +32,12 @@ local.properties
 keystore.properties
 signing.properties
 
+# Service configuration and profiling output
+google-services.json
+*.hprof
+
 # Logs and operating-system files
 *.log
 .DS_Store
 Thumbs.db
 desktop.ini
-
