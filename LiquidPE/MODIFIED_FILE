@@ -1,0 +1,12 @@
+MODIFIED_FILE
+Target: D:/liquidbounce/LiquidPE
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay (TopTab, ClickGuiRenderer, LiquidBounceOverlayView, ConfigStore)
+UI migration: E:/OpenClickGUI-main/LiquidPE visual metrics integrated into D Xposed module.
+Result: full E-style list rendering plus per-panel center-origin scaling, four tabs (ClickGUI/Config/Music/Materials), HUD Editor and Interface Settings in Misc, JSON configuration management, global Chinese/English text, verified NetEase search plus Meting playback, and local APK/ZIP material-pack loading.
+APK: D:/liquidbounce/LiquidPE/app/build/outputs/apk/release/app-release.apk
+APK SHA256: D8243D37491B489BFCF812F454AE3BA1CBB752D4D0CEF648814881F096EC7526
+
+2026-08-26 mobile top-control update
+Changed branch: LiquidBounceUiMetrics.java, ClickGuiRenderer.java, ExampleUnitTest.java
+Result: centered top tabs enlarged from 300x42 to 520x64 with 20px labels; centered search enlarged from 900x75 to 1140x88 with 30px text; tab hit widths now derive from rendered geometry.
+APK SHA256: 892B0F75E0D1402C18E74EBEDA28574658F361D2F6F9CB2BED6B79EB44AC1F5E

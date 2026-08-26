@@ -1,0 +1,34 @@
+DIFF_FILE
+Reference: E:/OpenClickGUI-main/LiquidPE
+Target: D:/liquidbounce/LiquidPE
+
+2026-08-26 mobile top-control update
+Changed branch: LiquidBounceUiMetrics.java
+Result: TOP_TABS 300x42 -> 520x64 and SEARCH 900x75 -> 1140x88, both preserving horizontal center at x=1470 and keeping the search bottom above PANEL_Y.
+
+Changed branch: ClickGuiRenderer.java
+Result: top-tab labels 14 -> 20, search text 24 -> 30, animated indicator radius follows the enlarged height, and tap segmentation derives from TOP_TABS_WIDTH / tab count instead of hard-coded 75.
+
+Changed branch: ExampleUnitTest.java
+Result: verifies centered geometry, panel clearance, and a minimum 120px logical touch width per top tab.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/LiquidBounceUiMetrics.java
+Result: adopted reference search/panel metrics: search 900x75, panel 375px, header 59px, row 53px, panel y=194, default x positions 30/435/840/1245/1650/2070/2490.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/ClickGuiRenderer.java
+Result: migrated the complete E-style list path: header/icon geometry, 53px centered module rows, E setting rail and x/right insets, fixed setting heights, always-visible wrapped MultiSelect chips, E-style Dropdown overlay clipping/rows, and E scrollbar geometry; page tabs now use ClickGUI/Config with 220ms alpha/translation transition; HUD Editor and Interface Settings are regular expanded Misc modules; UI scale range is 75%-200% around panel centers.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/LiquidBounceOverlayView.java
+Result: removed fixed logical Canvas clip and retained full-screen Canvas with inverse transition touch mapping; user UI scale is no longer applied to the whole canvas. Each panel scales around its own stable center anchor, with transformed hit rectangles, dropdown bounds, panel containment, and scroll deltas; the open/close transition uses alpha/translation only; scale cap is 200%; Xposed overlay/logo/touch routing remains intact.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/LiquidBounceDataStore.java
+Result: demo category defaults now use migrated panel coordinates.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/ConfigStore.java
+Result: added app-private JSON persistence for module enabled/metadata/settings, HUD/interface state, panel layout, save/load/delete, and export copies.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/LiquidBounceI18n.java and ClickGuiRenderer.java
+Result: added runtime language registration API and translated global navigation, search, config actions/status, HUD/interface settings, new Misc modules, and all newly introduced user-facing strings.
+
+Changed branch: app/src/main/java/com/liquid/org/ui/overlay/MusicStore.java, MaterialStore.java, LiquidBounceModels.java, LiquidBounceOverlayView.java, and AndroidManifest.xml
+Result: added Music and Materials top tabs; verified official NetEase public search response and Meting audio stream; added independent music keyboard input, result playback/stop/status; added app-private APK/ZIP material scan, refresh, selection persistence, AssetManager loading, and INTERNET permission.
