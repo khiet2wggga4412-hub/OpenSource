@@ -1,38 +1,50 @@
-# LiquidGlassClickGUI
+# My-Git Android UI Projects
 
-一个面向 Android 12+ 的纯 Kotlin / Jetpack Compose ClickGUI 界面工程，使用 Kyant0 Backdrop 实现液态玻璃视觉效果。
+本仓库用于集中维护 Android ClickGUI、HUD 与 Xposed 界面实验项目。当前 `main` 分支包含两个彼此独立的 Gradle 工程，构建时请进入对应目录或使用对应 Wrapper。
 
-> [!IMPORTANT]
-> 当前仓库只实现界面、交互状态与宿主界面挂载，不包含游戏功能后端。
+## 项目目录
 
-## 功能概览
+| 项目 | 路径 | 技术栈 | 说明 |
+| --- | --- | --- | --- |
+| LiquidGlassClickGUI | 仓库根目录 | Kotlin、Jetpack Compose | 原有液态玻璃 ClickGUI 界面工程 |
+| LiquidPE | [`LiquidPE/`](LiquidPE/) | Java、Android View、Xposed API 82 | 水影风格 ClickGUI、HUD、配置、音乐与材质界面模块 |
 
-- 液态玻璃背景、侧边分类导航和模块卡片
-- Toggle、Slider、ComboBox 与 Dialog 动画
-- 长按打开模块设置页
-- 主悬浮按钮、功能快捷按钮与灵动岛式状态提示
-- Compose Array List 与持久 HUD 覆盖层
-- LOX / Xposed 入口，可将 Compose View 挂载到 `com.netease.x19` 的 Activity
+## LiquidPE
 
-## 工程边界
+LiquidPE 提供以下界面与模块能力：
 
-本项目不包含：
+- ClickGUI 分类面板、模块列表及完整设置组件
+- HUD ArrayList、按键列表和通知界面
+- 面板拖拽、独立中心缩放和全局 UI 比例调节
+- 中英文全局文本切换与自定义字体
+- 配置保存、加载、导出和删除
+- Music 与 Materials 顶部分区
+- 标准 `assets/xposed_init` 入口和 `com.netease.x19` 默认作用域
+- 无桌面启动入口的模块化部署方式
 
-- C / C++、JNI、NDK 或 CMake 构建
-- Minecraft / Bedrock SDK
-- ShadowHook 或其他 native inline hook
-- 内存读写、数据包处理或游戏功能实现
+最新源码标签：[`LiquidPE-v1.0-20260826`](https://github.com/khiet2wggga4412-hub/My-Git/tree/LiquidPE-v1.0-20260826)
 
-模块开关和设置只更新进程内的 Compose UI 状态，不会改变游戏行为。
+### 构建 LiquidPE
 
-## 环境要求
+Windows PowerShell：
 
-- JDK 21（项目编译出的 JVM 字节码目标为 Java 17）
-- Android Studio 或命令行 Android SDK
-- Android SDK Platform 37（`compileSdk = 37`）
-- 最低 Android 12（API 31）
+```powershell
+cd LiquidPE
+.\gradlew.bat :app:test :app:assembleRelease --no-daemon
+```
 
-## 构建
+macOS / Linux：
+
+```bash
+cd LiquidPE
+./gradlew :app:test :app:assembleRelease --no-daemon
+```
+
+未配置本地签名时会生成未签名 Release APK。发布签名文件、`keystore.properties`、本地 SDK 配置和构建缓存均不会提交到仓库。
+
+## LiquidGlassClickGUI
+
+根目录工程保留原有 Kotlin / Jetpack Compose 液态玻璃界面实现及相关文档。
 
 Windows PowerShell：
 
@@ -40,43 +52,23 @@ Windows PowerShell：
 .\gradlew.bat :app:assembleDebug
 ```
 
-macOS / Linux：
+详细开发资料见 [`docs/`](docs/) 和 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
 
-```bash
-./gradlew :app:assembleDebug
-```
-
-生成的 APK 位于 `app/build/outputs/apk/debug/app-debug.apk`。
-
-## 项目结构
+## 仓库结构
 
 ```text
-LiquidGlassClickGUI/
-├─ .github/workflows/       GitHub Actions 构建检查
-├─ app/
-│  ├─ libs/                 Xposed API（仅编译期使用）
-│  └─ src/
-│     ├─ debug/             Debug 专用入口或工具
-│     └─ main/
-│        ├─ assets/         Xposed 模块入口声明
-│        ├─ java/
-│        │  ├─ com.kyant…   基于官方示例修改的玻璃组件
-│        │  └─ dev.liquid.clickgui/
-│        │     ├─ data/     UI 目录与目标应用契约
-│        │     ├─ glass/    液态玻璃导航和弹窗
-│        │     ├─ model/    界面模型
-│        │     ├─ overlay/  独立覆盖层
-│        │     ├─ ui/       Compose 页面与交互
-│        │     └─ xposed/   宿主识别与界面挂载
-│        └─ res/            Android 资源
-├─ docs/                    开发文档
-└─ gradle/                  Gradle Wrapper
+My-Git/
+├─ app/                    LiquidGlassClickGUI Android 模块
+├─ docs/                   LiquidGlassClickGUI 文档
+├─ LiquidPE/               LiquidPE 独立 Gradle 工程
+│  ├─ app/src/             Android/Xposed 源码与资源
+│  ├─ gradle/              Gradle Wrapper 与版本目录
+│  ├─ RELEASE.md           LiquidPE 发布与校验信息
+│  └─ VERIFICATION.txt     构建、签名及回滚记录
+├─ gradle/                 根目录工程 Gradle Wrapper
+└─ README.md               项目索引
 ```
 
-详细的界面扩展方式见 [开发指南](docs/DEVELOPMENT_GUIDE_ZH.md)。
+## 说明
 
-## 第三方代码与许可
-
-第三方来源、修改说明和许可信息见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。相关 Apache License 2.0 全文见 [KYANT0-APACHE-2.0.txt](KYANT0-APACHE-2.0.txt)。
-
-项目自身的开源许可证尚未指定。在公开发布前，请根据你的授权意图添加项目级 `LICENSE`；在此之前，默认不授予第三方复制、修改或分发项目自有代码的权利。
+仓库中的界面模块用于 UI 开发、兼容性测试和技术研究。模块行为取决于使用者配置的运行环境与作用域。请勿提交签名密钥、账号凭据、设备日志或其他敏感文件。
