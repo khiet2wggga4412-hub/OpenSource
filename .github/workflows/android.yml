@@ -11,8 +11,17 @@ permissions:
 
 jobs:
   build:
+    name: ${{ matrix.project }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - LiquidGlassClickGUI
+          - LiquidPE
+          - MD3-ClickGui-NextGen
 
     steps:
       - name: Check out repository
@@ -27,7 +36,12 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # Every project is self-contained with its own wrapper. JDK 21 is supplied above, so Gradle
+      # never needs to download a toolchain; disabling that keeps the build offline-deterministic.
       - name: Build debug APK
+        working-directory: ${{ matrix.project }}
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon :app:assembleDebug
+          ./gradlew --no-daemon --stacktrace \
+            -Dorg.gradle.java.installations.auto-download=false \
+            :app:assembleDebug

@@ -45,15 +45,16 @@ cd LiquidPE
 
 ## LiquidGlassClickGUI
 
-根目录工程保留原有 Kotlin / Jetpack Compose 液态玻璃界面实现及相关文档。
+[`LiquidGlassClickGUI/`](LiquidGlassClickGUI/) 是最早的 Kotlin / Jetpack Compose 液态玻璃 ClickGUI 工程，独立 Gradle 工程，自带 Wrapper。依赖 `io.github.kyant0:backdrop` 与 `shapes`，其许可证见 [`LiquidGlassClickGUI/KYANT0-APACHE-2.0.txt`](LiquidGlassClickGUI/KYANT0-APACHE-2.0.txt)。
 
 Windows PowerShell：
 
 ```powershell
+cd LiquidGlassClickGUI
 .\gradlew.bat :app:assembleDebug
 ```
 
-详细开发资料见 [`docs/`](docs/) 和 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+需要 JDK 21（工程通过 toolchain 声明）；SDK 路径由 Android Studio 写入 `local.properties`（不提交）。开发资料见 [`LiquidGlassClickGUI/docs/`](LiquidGlassClickGUI/docs/) 与 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
 
 ## MD3 Click GUI NextGen
 
@@ -89,20 +90,25 @@ cd MD3-ClickGui-NextGen
 
 ```text
 My-Git/
-├─ app/                    LiquidGlassClickGUI Android 模块
-├─ docs/                   LiquidGlassClickGUI 文档
-├─ LiquidPE/               LiquidPE 独立 Gradle 工程
+├─ LiquidGlassClickGUI/    液态玻璃 ClickGUI（Kotlin / Compose）
+│  ├─ app/src/             源码与资源
+│  ├─ docs/                开发文档
+│  └─ gradle/              Gradle Wrapper
+├─ LiquidPE/               LiquidPE 独立 Gradle 工程（Java / Xposed）
 │  ├─ app/src/             Android/Xposed 源码与资源
 │  ├─ gradle/              Gradle Wrapper 与版本目录
-│  ├─ RELEASE.md           LiquidPE 发布与校验信息
+│  ├─ RELEASE.md           发布与校验信息
 │  └─ VERIFICATION.txt     构建、签名及回滚记录
-├─ MD3-ClickGui-NextGen/   MD3 Click GUI NextGen 独立 Gradle 工程
+├─ MD3-ClickGui-NextGen/   MD3 Click GUI NextGen（Kotlin / Compose / Material 3）
 │  ├─ app/src/             Compose 源码（ui/、music/）与资源
 │  ├─ docs/                优化评审与参考界面研究记录
 │  └─ gradle/              Gradle Wrapper
-├─ gradle/                 根目录工程 Gradle Wrapper
+├─ .github/workflows/      CI：三个工程各自独立构建
+├─ THIRD_PARTY_NOTICES.md  第三方组件声明
 └─ README.md               项目索引
 ```
+
+三个工程都是自包含的 Gradle 工程，各有独立 Wrapper、`settings.gradle.kts` 与版本配置，互不依赖。仓库根目录不再放置任何工程，只保留索引与仓库级文件。
 
 ## 说明
 
