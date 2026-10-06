@@ -11,6 +11,8 @@
 - [原分辨率面板裁切](../artifacts/reference-study/reference-panel.png)。
 - [视频元数据](../artifacts/reference-study/metadata.json)、[全部时间戳](../artifacts/reference-study/timestamps.json)、[逐帧变化量](../artifacts/reference-study/frame_differences.csv)。
 
+> **说明**：`artifacts/` 不纳入版本控制。其中 2536 张抽取帧约占 148 MB，且可由参考视频重建；`m3tmp3/` 是抽取出来的 Compose Material 3 上游源码（含其自带 Apache 许可证），属于第三方材料。列出的分析脚本（`analyze_video.py`、`build_viewer.py`、`measure_closing.py` 等）与时间戳、逐帧变化量等元数据保留在本地该目录中，重新运行脚本即可还原帧图与查看器。
+
 原片为 1920×1280，视频流长 25.970422 秒，容器长 26.021292 秒，共 2393 帧，使用可变帧率。分析图缩至 960×640，保留每一帧，不通过名义 FPS 推算时间。下文帧编号从 0 开始，原始像素尺寸与 Android dp 分开记录。
 
 已解码全部 2393 帧并计算相邻帧变化量。关键过渡用连续帧接触表核对，静止和重复内容用时间线筛查；这不代表人工逐张审阅所有重复帧。缩放、透明度和缓动由录屏近似推断，不能据此恢复原作者的精确动画曲线或源代码。
