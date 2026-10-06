@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -14,7 +9,7 @@ public final class LiquidBounceUiColors {
     public static final int ACCENT = 0xFF4677FF;
     public static final int ACCENT_SOFT = 0xFF6C92FF;
     public static final int ACCENT_DEEP = 0xFF1C2F66;
-    /** LiquidBounce default theme: black surface with translucent layered panels. */
+
     public static final int PANEL = 0xCC000000;
     public static final int PANEL_DEEP = 0xE6000000;
     public static final int PANEL_HIGHLIGHT = 0x26FFFFFF;

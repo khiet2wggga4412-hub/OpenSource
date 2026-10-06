@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.service;
 
@@ -33,10 +28,6 @@ import com.liquid.org.MainActivity;
 import com.liquid.org.R;
 import com.liquid.org.ui.overlay.LiquidBounceOverlayView;
 
-/**
- * 常驻在其他应用上方的前台服务。按钮和 ClickGUI 使用独立的 WindowManager 图层：
- * GUI 关闭时会移除全屏图层，因此不会遮挡或吞掉其他界面的触摸事件。
- */
 public class FloatingService extends Service {
     private static final String CHANNEL_ID = "liquidbounce_visual_overlay";
     private static final int NOTIFICATION_ID = 4301;
@@ -51,7 +42,6 @@ public class FloatingService extends Service {
     private boolean buttonAttached;
     private boolean clickGuiAttached;
 
-    /** 供 Activity 在已取得悬浮窗权限后启动；重复调用不会创建多个服务。 */
     public static boolean start(Context context) {
         if (!Settings.canDrawOverlays(context)) return false;
         ContextCompat.startForegroundService(context.getApplicationContext(), new Intent(context, FloatingService.class));
@@ -73,12 +63,12 @@ public class FloatingService extends Service {
     }
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
-        // 前台服务在页面切换甚至进程回收后仍会尝试恢复悬浮按钮。
+
         return START_STICKY;
     }
 
     private void createClickGuiLayer() {
-        // 复用现有 LiquidBounceOverlayView 及其 setClickGuiVisible 开关，不另写 ClickGUI。
+
         overlayView = new LiquidBounceOverlayView(this);
         overlayView.setHudVisible(true);
         overlayView.setTransparentBase(true);
@@ -121,7 +111,6 @@ public class FloatingService extends Service {
         buttonAttached = true;
     }
 
-    /** 以触摸阈值区分点击和拖动，拖动结束时保存按钮位置。 */
     private void installDragListener() {
         final int touchSlop = ViewConfiguration.get(this).getScaledTouchSlop();
         floatingButton.setOnTouchListener(new View.OnTouchListener() {
@@ -176,7 +165,7 @@ public class FloatingService extends Service {
             clickGuiAttached = true;
         }
         overlayView.setClickGuiVisible(true);
-        // 全屏 GUI 后重新附加关闭按钮，确保按钮保持在最上层。
+
         bringButtonToFront();
     }
 
@@ -185,7 +174,6 @@ public class FloatingService extends Service {
         overlayView.setClickGuiVisible(false);
     }
 
-    /** Called only after the 170 ms close animation reaches scale/alpha zero. */
     private void detachClickGuiAfterAnimation() {
         if (!clickGuiAttached || overlayView == null || overlayView.isClickGuiVisibleRequested()) return;
         windowManager.removeView(overlayView);
@@ -210,7 +198,6 @@ public class FloatingService extends Service {
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
     }
-
 
     private Notification createNotification() {
         Intent open = new Intent(this, MainActivity.class);

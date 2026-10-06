@@ -7,10 +7,6 @@ import com.example.md3clickgui.ui.model.ModuleBinding
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/**
- * NetEase Cloud Music player card; rendered by a dedicated panel, not the generic settings UI.
- * Bound to [ModuleBinding.Content] so the module list shows no enable switch for it.
- */
 object MusicModule : ModuleDefinition {
     override val sectionId = SectionIds.MUSIC
     override val model = GuiModule(

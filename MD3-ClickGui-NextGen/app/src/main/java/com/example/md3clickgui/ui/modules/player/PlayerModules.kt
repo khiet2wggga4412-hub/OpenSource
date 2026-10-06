@@ -10,8 +10,6 @@ import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/* Player cards. Same shape as the other standard modules. */
-
 object AutoTotemModule : ModuleDefinition {
     private const val ID = "player.autototem"
 

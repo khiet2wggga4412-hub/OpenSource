@@ -13,9 +13,6 @@ fun interface HookFeature {
     fun install(loadPackageParam: XC_LoadPackage.LoadPackageParam)
 }
 
-/**
- * 功能放在独立 HookFeature 中，入口只负责目标包隔离和错误保护。
- */
 object HookRegistry {
     private val features = CopyOnWriteArrayList<HookFeature>()
 

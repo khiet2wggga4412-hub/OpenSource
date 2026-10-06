@@ -10,8 +10,6 @@ import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/* Movement cards. Same shape as the Combat ones: enable switch, then settings. */
-
 object SprintModule : ModuleDefinition {
     private const val ID = "movement.sprint"
 

@@ -63,10 +63,6 @@ data class SideNavigationItem(
     val iconRes: Int = 0,
 )
 
-/**
- * 基于 Kyant0 LiquidBottomTabs 的绘制结构改造：玻璃底座和选中透镜仍是两层 Backdrop，
- * 只把水平位移改为纵向位移。此文件是经过修改的衍生实现。
- */
 @Composable
 fun LiquidSideNavigation(
     items: List<SideNavigationItem>,

@@ -11,16 +11,11 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 
-/**
- * Foreground service that keeps the process alive while music is streaming. It owns the persistent
- * notification (with play/pause and stop actions); the actual [MediaPlayer] lives in [MusicPlayer].
- */
 class MusicPlaybackService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var lastPosted: String? = null
 
-    /** The notification embeds live state, so the actions would go stale without a refresh. */
     private val refreshNotification = object : Runnable {
         override fun run() {
             postNotification()
@@ -47,8 +42,7 @@ class MusicPlaybackService : Service() {
             }
             ACTION_TOGGLE -> MusicPlayer.toggle()
         }
-        // startForeground must precede any notify() on this id, and it also picks up a state
-        // change that happened before the service was started.
+
         startForeground(NOTIFICATION_ID, buildNotification())
         lastPosted = notificationFingerprint()
         handler.removeCallbacks(refreshNotification)
@@ -70,7 +64,6 @@ class MusicPlaybackService : Service() {
         getSystemService(NotificationManager::class.java).notify(NOTIFICATION_ID, buildNotification())
     }
 
-    /** Cheap comparison key; the notification is only rebuilt when playback state actually moves. */
     private fun notificationFingerprint(): String {
         val song = MusicPlayer.currentSong
         return "${song?.id}|${MusicPlayer.isPlaying}|${MusicPlayer.error}"

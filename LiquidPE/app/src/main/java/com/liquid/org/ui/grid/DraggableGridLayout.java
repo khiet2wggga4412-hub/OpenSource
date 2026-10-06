@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.grid;
 
@@ -25,10 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * 可自由编辑的网格容器。子 View 的点击仍由 Android 正常分发；只有长按顶层面板的空白区域后，
- * 容器才开始拦截后续事件并负责拖拽、吸附和碰撞处理。
- */
 public class DraggableGridLayout extends ViewGroup {
     public static class LayoutParams extends MarginLayoutParams {
         public PanelLayoutInfo panelInfo;
@@ -81,7 +72,6 @@ public class DraggableGridLayout extends ViewGroup {
         setClipChildren(false);
     }
 
-    /** 默认四列，可按业务需要覆盖；列数变化后仍以逻辑坐标重新布局。 */
     public void setColumnCount(int columns) {
         int valid = Math.max(1, columns);
         if (columnCount == valid) return;
@@ -106,7 +96,6 @@ public class DraggableGridLayout extends ViewGroup {
         invalidate();
     }
 
-    /** 添加一个具备稳定 id 的面板。重复 id 会被忽略，避免损坏布局数据。 */
     public boolean addPanel(View panel, String panelId, int spanX, int spanY) {
         if (panel == null || panelId == null || panelId.trim().isEmpty() || findPanelById(panelId) != null) return false;
         LayoutParams params = panel.getLayoutParams() instanceof LayoutParams
@@ -134,7 +123,7 @@ public class DraggableGridLayout extends ViewGroup {
                 occupiedIds.add(params.panelInfo.panelId);
             }
         });
-        // 保存自动修复后的版本，避免下一次启动再次读取无效数据。
+
         saveLayout();
         requestLayout();
     }
@@ -147,7 +136,6 @@ public class DraggableGridLayout extends ViewGroup {
         storage.save(infos);
     }
 
-    /** 清除保存结果，按子 View 加入顺序重新放到第一个可用位置。 */
     public void resetLayout() {
         storage.clear();
         forEachPanel(new PanelVisitor() {
@@ -355,7 +343,6 @@ public class DraggableGridLayout extends ViewGroup {
                 && !isOccupied(info.gridX, info.gridY, info.spanX, info.spanY, ignored);
     }
 
-    /** 独立碰撞检测：两个网格矩形只要有交集就不能共存。 */
     private boolean isOccupied(int x, int y, int spanX, int spanY, View ignored) {
         final boolean[] occupied = {false};
         forEachPanel(new PanelVisitor() {

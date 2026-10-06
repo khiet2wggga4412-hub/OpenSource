@@ -17,7 +17,7 @@ data class GlassPalette(
     val warning: Color = Color(0xFFFFB020),
     val danger: Color = Color(0xFFFF5268),
     val scrim: Color = Color(0x30001828),
-    // 纯白根背景上使用轻微蓝灰玻璃色，保持层级而不重复绘制整张白底。
+
     val glassSurface: Color = Color(0x78EAF2F8),
     val glassSurfaceStrong: Color = Color(0xEDF8FBFD),
     val hairline: Color = Color(0x33101820),

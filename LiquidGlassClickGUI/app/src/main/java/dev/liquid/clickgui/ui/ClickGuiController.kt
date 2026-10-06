@@ -67,7 +67,6 @@ class ClickGuiController(
             modules += dynamicIslandNoticeModule
         }
 
-        // The array list and dynamic-island notices are genuine Compose UI behavior.
         bindLocalModule(ARRAY_LIST_ID, COMPOSE_OVERLAY_BACKEND)
 
         ClickGuiRenderer.selectBackgroundMode(
@@ -96,7 +95,6 @@ class ClickGuiController(
 
         ModuleSwitchSoundPlayer.play(enabled)
 
-        // Its own OFF event is the final notice; other modules obey the master switch.
         val mayShowNotice = dynamicIslandNoticeModule.enabled ||
             module.id == DYNAMIC_ISLAND_NOTICE_ID
         if (mayShowNotice) {
@@ -220,7 +218,6 @@ class ClickGuiController(
         persistIfEnabled()
     }
 
-    /** Handles a host Activity key event and returns true only when the key was consumed. */
     fun handleShortcutKey(keyCode: Int): Boolean {
         if (keyCode <= 0) return false
         if (pendingShortcutModule != null) {

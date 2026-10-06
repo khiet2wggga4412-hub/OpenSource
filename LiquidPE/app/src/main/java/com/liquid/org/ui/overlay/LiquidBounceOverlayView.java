@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -170,23 +165,18 @@ public class LiquidBounceOverlayView extends FrameLayout implements ClickGuiRend
         }
     }
 
-
-    /** One transform and one alpha layer keep tabs, search, panels, and controls perfectly synchronized. */
     private void drawAnimatedClickGui(Canvas canvas, float progress, long now) {
-        // Convert the requested screen-pixel drift into logical canvas units after viewport scaling.
+
         float translationY = CLICK_GUI_TRANSLATION_PX * (1f - progress) / Math.max(0.001f, viewport.getScale());
         int transformSave = canvas.save();
         canvas.translate(0f, translationY);
-        // User UI scale is applied per category panel by ClickGuiRenderer. The
-        // overlay transition intentionally uses only alpha and a small offset so
-        // top tabs/search never move with a canvas-wide scale.
+
         int alphaLayer = canvas.saveLayerAlpha(null, Math.round(255f * progress));
         clickGuiRenderer.draw(canvas, debugBounds, now);
         canvas.restoreToCount(alphaLayer);
         canvas.restoreToCount(transformSave);
     }
 
-    /** Use the supplied Shuiying logo asset without redrawing or altering its shape. */
     private void drawFloatingToggle(Canvas canvas) {
         if (floatingLogo != null) {
             rectForFloatingIcon.set(FLOATING_ICON_MARGIN, FLOATING_ICON_MARGIN,
@@ -403,7 +393,6 @@ public class LiquidBounceOverlayView extends FrameLayout implements ClickGuiRend
 
     public float getGlobalUiScale() { return globalUiScale; }
 
-    /** Animate the existing ClickGUI as a single object; rapid reversals continue from the current value. */
     public void setClickGuiVisible(boolean visible) {
         if (clickGuiVisible == visible && clickGuiTransition.getTarget() == (visible ? 1f : 0f)) return;
         clickGuiVisible = visible;
@@ -413,7 +402,6 @@ public class LiquidBounceOverlayView extends FrameLayout implements ClickGuiRend
         postInvalidateOnAnimation();
     }
 
-    /** Used before a detached overlay is first shown, so no invisible transition runs in the background. */
     public void setClickGuiVisibleImmediately(boolean visible) {
         clickGuiVisible = visible;
         closedCallbackDispatched = !visible;
@@ -448,7 +436,7 @@ public class LiquidBounceOverlayView extends FrameLayout implements ClickGuiRend
     public void pushNotification(NotificationSpec notification) { hudRenderer.pushNotification(notification); invalidate(); }
     public void setDebugBoundsEnabled(boolean enabled) { debugBounds = enabled; invalidate(); }
     public void setReferenceGridEnabled(boolean enabled) { referenceGrid = enabled; invalidate(); }
-    /** 进入当前功能面板的布局编辑模式；网格仅在该模式或拖动期间显示。 */
+
     public void enterEditMode() { clickGuiRenderer.enterEditMode(); invalidate(); }
     public void exitEditMode() { clickGuiRenderer.exitEditMode(); invalidate(); }
     public boolean isEditMode() { return clickGuiRenderer.isEditMode(); }
@@ -480,7 +468,6 @@ public class LiquidBounceOverlayView extends FrameLayout implements ClickGuiRend
         return super.onKeyUp(keyCode, event);
     }
 
-    /** Time-based visibility interpolation with direction-specific Solar-style easing. */
     private static final class ClickGuiTransition {
         private float startValue;
         private float value;

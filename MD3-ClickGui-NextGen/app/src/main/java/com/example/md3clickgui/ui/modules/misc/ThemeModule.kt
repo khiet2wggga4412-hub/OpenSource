@@ -9,7 +9,6 @@ import com.example.md3clickgui.ui.theme.NexusThemeSwatchNames
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/** Global color palette selector exposed as a regular Misc module. */
 object ThemeModule : ModuleDefinition {
     private const val ID = "misc.theme"
 

@@ -21,10 +21,6 @@ import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-/**
- * Xposed entry point for the authorized UI test target.
- * The hook loads LiquidPE's UI and observes the target's UniFix lifecycle.
- */
 public final class HookInit implements IXposedHookLoadPackage {
     private static final String TAG = "LiquidPE-Hook";
     private static final String TARGET_PACKAGE = "com.netease.x19";
@@ -103,7 +99,7 @@ public final class HookInit implements IXposedHookLoadPackage {
 
     private static boolean isTargetActivityClass(String className) {
         if (className == null) return false;
-        // The target ships several launcher variants (MainActivityDefault/DynTest*).
+
         return MAIN_ACTIVITY.equals(className)
                 || className.startsWith("com.mojang.minecraftpe.MainActivity")
                 || className.startsWith("com.netease.minecraftpe.MainActivity");
@@ -137,7 +133,7 @@ public final class HookInit implements IXposedHookLoadPackage {
                     moduleContext.getApplicationInfo().nativeLibraryDir,
                     activity.getClassLoader());
             Class<?> viewType = Class.forName(OVERLAY_VIEW, true, loader);
-            // Keep target lifecycle/application state while resolving the UI's R values from the module APK.
+
             Context overlayContext = new OverlayContext(activity, moduleContext);
             View view = (View) viewType.getConstructor(Context.class).newInstance(overlayContext);
             viewType.getMethod("setTransparentBase", boolean.class).invoke(view, true);

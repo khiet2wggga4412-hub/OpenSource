@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -66,7 +61,6 @@ public final class HudRenderer {
         else if ("notifications".equals(component)) notificationsVisible = visible;
     }
 
-    /** 单独在功能菜单之后绘制，使 Binds 面板可见且可直接拖动。 */
     public void drawBindsOverlay(Canvas canvas, boolean debugBounds) {
         if (bindsDirty) refreshBinds();
         if (!bindsVisible || !isBindsPanelEnabled()) return;
@@ -92,7 +86,6 @@ public final class HudRenderer {
         if (debugBounds) drawDebugRect(canvas, x, y, width, height);
     }
 
-    /** Binds 开关放在 Render 分类中，默认关闭。 */
     private boolean isBindsPanelEnabled() {
         ModuleEntry bindsModule = dataStore.findModule("render.binds");
         return bindsModule != null && bindsModule.enabled;
@@ -113,7 +106,6 @@ public final class HudRenderer {
 
     private float getBindsHeight() { return 52 + Math.max(1, bindRows.size()) * 33f + 10; }
 
-    /** Binds 标题栏的独立拖动处理；只有开关开启时才会接管事件。 */
     public boolean onTouchDown(float x, float y) {
         if (bindsDirty) refreshBinds();
         if (!isBindsPanelEnabled()) return false;
@@ -240,7 +232,6 @@ public final class HudRenderer {
     }
     public void clearNotifications() { notifications.clear(); }
 
-    /** 语言切换后重测全部 ArrayList 宽度、刷新 Binds,保证新语言下宽度/排序正确。 */
     public void onLanguageChanged() {
         for (ArrayListEntry entry : arrayEntries) {
             ModuleEntry module = dataStore.findModule(entry.moduleId);

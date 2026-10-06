@@ -43,7 +43,6 @@ import com.example.md3clickgui.ui.theme.NexusDimensions
 import com.example.md3clickgui.ui.theme.NexusSpacing
 import kotlin.math.roundToInt
 
-/** Renders enabled module shortcuts above the collapsed window state. */
 @Composable
 fun ShortcutLayer(
     modules: List<GuiModule>,
@@ -58,8 +57,6 @@ fun ShortcutLayer(
         label = "quickButtonLayerAlpha"
     )
 
-    // Keep the positioning layer alive through the entire fade. Removing it at
-    // the visibility boundary causes a one-frame remeasure and visible jitter.
     BoxWithConstraints(
         modifier = modifier.graphicsLayer { alpha = shortcutAlpha }
     ) {
@@ -112,7 +109,6 @@ fun ShortcutLayer(
     }
 }
 
-/** Project name: the label the collapsed-window button carries once it shows text. */
 private const val MaterialLabel = "Material"
 
 @Composable
@@ -220,8 +216,6 @@ private fun QuickShortcut(
     }
 }
 
-
-/** The collapsed-window control, positioned independently from the scaled panel. */
 @Composable
 fun OpenPanelButton(
     state: ClickGuiState,

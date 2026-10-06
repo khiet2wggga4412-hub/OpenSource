@@ -6,14 +6,8 @@ import android.graphics.Color
 import java.net.HttpURLConnection
 import java.net.URL
 
-/**
- * Self-contained cover art utilities: download album art over HTTP and extract a dominant accent
- * color for theming the player. No Coil / Glide / Palette dependency — keeps the music module light
- * and buildable offline.
- */
 object CoverArt {
 
-    /** Downloads and decodes a cover image; returns null on any failure. Call from a background thread. */
     fun loadCover(url: String): Bitmap? {
         if (url.isBlank()) return null
         val target = url.replace("http://", "https://")
@@ -34,11 +28,6 @@ object CoverArt {
         }
     }
 
-    /**
-     * A saturation/luminance-weighted average of the image's pixels. Ignores near-black, near-white
-     * and desaturated pixels so the result stays vivid enough to use as an accent. Returns 0 when no
-     * suitable color is found (caller falls back to the theme primary).
-     */
     fun dominantColor(bitmap: Bitmap): Int {
         val targetW = 40
         val targetH = (targetW * bitmap.height / bitmap.width.toFloat()).coerceAtLeast(1f).toInt()

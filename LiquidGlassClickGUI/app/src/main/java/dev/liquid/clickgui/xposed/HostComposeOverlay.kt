@@ -47,10 +47,6 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.roundToInt
 
-/**
- * 与参考项目相同，UI 使用游戏 Activity 作为 Context，并挂到游戏 DecorView。
- * 这里只挂载 Compose View，不加载任何 native 功能后端。
- */
 internal object HostComposeOverlay {
     private var activityRef = WeakReference<Activity>(null)
     private var hostContainer: ViewGroup? = null
@@ -232,7 +228,6 @@ internal object HostComposeOverlay {
         detachLocked()
     }
 
-    /** Host keyboard shortcuts remain active while the main menu is collapsed. */
     fun onKeyEvent(event: KeyEvent): Boolean {
         if (event.action != KeyEvent.ACTION_DOWN || event.repeatCount != 0) return false
         return controller?.handleShortcutKey(event.keyCode) == true
@@ -264,7 +259,6 @@ internal object HostComposeOverlay {
         expanded = value
     }
 
-    /** 在 Compose 退出动画结束后才真正改变宿主 View 的尺寸和位置。 */
     private fun applyLayoutMode(activity: Activity, value: Boolean) {
         if (activityRef.get() !== activity) return
         val view = composeView ?: return

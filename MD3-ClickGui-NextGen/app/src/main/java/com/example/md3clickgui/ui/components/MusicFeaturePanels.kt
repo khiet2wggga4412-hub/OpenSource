@@ -126,9 +126,7 @@ fun RecentPanel(languageIndex: Int, onClose: () -> Unit, modifier: Modifier = Mo
         }
     }
 }
-// ---------------------------------------------------------------------------------------------
-// Shared building blocks.
-// ---------------------------------------------------------------------------------------------
+
 @Composable
 private fun FeatureHeader(
     title: String,

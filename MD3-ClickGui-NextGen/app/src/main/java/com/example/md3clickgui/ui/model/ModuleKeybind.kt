@@ -3,32 +3,18 @@ package com.example.md3clickgui.ui.model
 import android.view.KeyEvent
 import androidx.compose.runtime.Immutable
 
-/**
- * A physical button bound to a module.
- *
- * Only real input devices produce these: the Compose key pipeline reports a keyboard or gamepad
- * button as a [KeyEvent] with a stable code, so [keyCode] plus [isGamepad] is enough to identify one
- * and [label] is what the settings row shows.
- *
- * Mouse buttons are deliberately not modelled. Compose routes a mouse button through the pointer
- * pipeline (`PointerEvent.buttons`), not the key pipeline, so identifying button 4 and 5 would mean
- * re-implementing click handling for every control in the panel. Keyboard and gamepad cover the
- * buttons an emulator maps to a game's controls, which is what this panel is used with.
- */
 @Immutable
 data class ModuleKeybind(
     val keyCode: Int,
     val isGamepad: Boolean = false,
-    /** Human-readable name resolved once at capture time, e.g. "G" or "Button A". */
+
     val label: String
 )
 
-/** Android key codes that represent a gamepad button rather than a keyboard key. */
 private val GamepadKeyRange = KeyEvent.KEYCODE_BUTTON_A..KeyEvent.KEYCODE_BUTTON_MODE
 
 fun isGamepadKey(keyCode: Int): Boolean = keyCode in GamepadKeyRange
 
-/** Names shown in the settings row. Falls back to the numeric code for anything unmapped. */
 fun keyLabel(keyCode: Int): String = when (keyCode) {
     KeyEvent.KEYCODE_A -> "A"
     KeyEvent.KEYCODE_B -> "B"

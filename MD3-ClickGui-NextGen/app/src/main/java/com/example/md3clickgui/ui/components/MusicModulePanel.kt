@@ -88,7 +88,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.compose.ui.unit.IntOffset
 
-/** Full player panel for the Music module: search, results, and a now-playing bar with seeking. */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MusicModulePanel(
@@ -304,7 +303,6 @@ private fun SongRow(song: Song, isCurrent: Boolean, onClick: () -> Unit) {
     }
 }
 
-/** Cover artwork; falls back to an accent-tinted gradient + note when no image is available. */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun ArtworkTile(isBuffering: Boolean, cover: Bitmap?, accent: Color, modifier: Modifier = Modifier) {
@@ -345,7 +343,7 @@ private fun NowPlayingCard(
     val position = player.positionMs.coerceIn(0L, duration)
     Surface(shape = NexusCornerShape, color = colors.surfaceContainer) {
         Column(Modifier.fillMaxWidth().padding(NexusSpacing.medium)) {
-            // Hoisted out of transitionSpec, which is not a composable scope.
+
             val trackFadeSpec = NexusMotion.enterSpec<Float>()
             val trackExitFadeSpec = NexusMotion.exitSpec<Float>()
             val trackSlideSpec = NexusMotion.enterSpec<IntOffset>()

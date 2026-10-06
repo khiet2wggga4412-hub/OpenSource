@@ -31,7 +31,6 @@ import com.example.md3clickgui.ui.theme.NexusDimensions
 import com.example.md3clickgui.ui.theme.NexusIconShape
 import com.example.md3clickgui.ui.theme.NexusMotion
 
-/** A shared pill slides beneath the labels, with no press ripple. */
 @Composable
 internal fun CompactSegmentedControl(
     options: List<String>, selectedIndex: Int, onSelect: (Int) -> Unit,

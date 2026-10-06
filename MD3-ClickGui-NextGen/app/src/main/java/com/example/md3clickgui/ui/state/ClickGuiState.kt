@@ -42,11 +42,6 @@ data class ConfigSnapshot(
     val keybinds: Map<String, ModuleKeybind> = emptyMap()
 )
 
-/**
- * Single owner of card UI state: selection, panel visibility, per-card enable switches, per-setting values,
- * and the app-level theme bindings. Cards stay stateless, so adding or removing a module
- * requires no state wiring anywhere.
- */
 class ClickGuiState(
     initialDarkMode: Boolean = false,
     initialDynamicColor: Boolean = false,
@@ -114,7 +109,6 @@ class ClickGuiState(
         isWindowOpen = true
     }
 
-    /** Local demo authentication: both fields are required before the loading phase starts. */
     fun submitCredentials(username: String, password: String, remember: Boolean): Boolean {
         val normalizedUsername = username.trim()
         if (normalizedUsername.isEmpty() || password.isBlank()) return false
@@ -132,7 +126,6 @@ class ClickGuiState(
 
     fun canInteractWithModules(): Boolean = isAuthenticated && !isLoginLoading
 
-    /** Switch state for any card: bound modules read their app-level flag, standard modules their own entry. */
     fun isChecked(module: GuiModule): Boolean = when (module.binding) {
         ModuleBinding.Standard -> enabledModules[module.id] == true
         ModuleBinding.DarkMode -> darkMode
@@ -169,7 +162,6 @@ class ClickGuiState(
         }
     }
 
-    /** A shortcut is only meaningful for a module that can actually be on or off. */
     fun isQuickShortcutEnabled(module: GuiModule): Boolean =
         module.binding != ModuleBinding.Theme &&
             module.binding != ModuleBinding.Language &&
@@ -181,17 +173,10 @@ class ClickGuiState(
         quickShortcutValues[module.id] = enabled
     }
 
-    /**
-     * Peripheral button bound to a module, or null.
-     *
-     * Every module may carry one, including the ones without an enable switch: pressing the button
-     * runs [triggerKeybind], which toggles a switchable module and opens the panel for a content
-     * module.
-     */
     fun keybind(module: GuiModule): ModuleKeybind? = keybinds[module.id]
 
     fun bindKey(module: GuiModule, keybind: ModuleKeybind) {
-        // One button drives one module: take it away from whoever held it before.
+
         keybinds.entries.removeAll { it.value.keyCode == keybind.keyCode && it.key != module.id }
         keybinds[module.id] = keybind
     }
@@ -200,12 +185,6 @@ class ClickGuiState(
         keybinds.remove(module.id)
     }
 
-    /**
-     * Runs the action bound to a module.
-     *
-     * Content modules (the music player and its browse panels) have no off state, so the button opens
-     * them instead of toggling.
-     */
     fun triggerKeybind(module: GuiModule) {
         if (module.binding == ModuleBinding.Content) {
             selectModule(module.id)
@@ -215,7 +194,6 @@ class ClickGuiState(
         }
     }
 
-    /** Global shortcut style; index matches ShortcutModule's "Style" choice order. */
     fun shortcutStyle(): ShortcutStyle = when (
         choiceValues[settingKey(ShortcutModuleId, ShortcutStyleLabel)] ?: 0
     ) {
@@ -385,14 +363,12 @@ class ClickGuiState(
         keybinds.putAll(snapshot.keybinds)
     }
 
-    /** Manual theme choices and the system palette are mutually exclusive. */
     private fun applyThemeIndex(index: Int) {
         themeIndex = index.coerceIn(0, ThemeSwatchCount - 1)
         dynamicColor = false
         customThemeHex = null
     }
 
-    /** Enabling dynamic color must be observable even after a custom accent was selected. */
     private fun applyDynamicColor(enabled: Boolean) {
         dynamicColor = enabled
         if (enabled) {
@@ -413,7 +389,6 @@ class ClickGuiState(
         private const val DefaultShortcutCornerRadius = 10f
         private fun settingKey(moduleId: String, label: String) = "$moduleId/$label"
 
-        /** Encodes every map as a "key=value" line list of strings so the whole state is Bundle-safe. */
         val Saver: Saver<ClickGuiState, *> = listSaver(
             save = { state ->
                 listOf(
@@ -431,14 +406,14 @@ class ClickGuiState(
                     state.themeIndex.toString(),
                     state.customThemeHex.orEmpty(),
                     if (state.rememberLogin) "1" else "0",
-                    "", // Legacy license-key slot kept for state compatibility.
+                    "",
                     if (state.rememberLogin) state.accountName.orEmpty() else "",
                     if (state.rememberLogin) state.accountExpiryText.orEmpty() else "",
                     "${state.openPanelButtonPosition.xFraction},${state.openPanelButtonPosition.yFraction}",
                     state.languageIndex.toString(),
                     encodeConfigs(state.configurations),
                     state.nextConfigId.toString(),
-                    // Appended last: the indices above are positional and older saves must keep working.
+
                     encodeKeybinds(state.keybinds)
                 )
             },
@@ -474,7 +449,7 @@ class ClickGuiState(
                         nextConfigId = values.getOrNull(20)?.toIntOrNull() ?: configs.size
                         decodeKeybinds(values.getOrNull(21).orEmpty(), keybinds)
                     } else {
-                        // The previous saver stored expanded card ids at index 3.
+
                         decodeInto(values[4], toggleValues) { it == "1" }
                         decodeInto(values[5], sliderValues) { it.toFloat() }
                         decodeInto(values[6], choiceValues) { it.toInt() }
@@ -527,11 +502,6 @@ class ClickGuiState(
         private fun decodeText(value: String): String =
             runCatching { String(Base64.getDecoder().decode(value), Charsets.UTF_8) }.getOrDefault("")
 
-        /**
-         * `moduleId=keyCode,isGamepad,base64(label)` per line.
-         *
-         * The label is Base64-encoded so a name containing `,` or `=` cannot split the record.
-         */
         private fun encodeKeybinds(map: Map<String, ModuleKeybind>): String =
             map.entries.joinToString("\n") { (moduleId, bind) ->
                 "$moduleId=${bind.keyCode},${if (bind.isGamepad) 1 else 0},${encodeText(bind.label)}"

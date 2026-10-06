@@ -8,7 +8,6 @@ import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/** Global language selector exposed in the Misc section. */
 object LanguageModule : ModuleDefinition {
     private const val ID = "misc.language"
 

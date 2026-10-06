@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-/** Coordinates the full panel and collapsed floating button without clipping exit animations. */
 @Composable
 fun AnimatedOverlaySwitcher(
     expanded: Boolean,
@@ -137,7 +136,6 @@ fun AnimatedOverlaySwitcher(
     }
 }
 
-/** A restrained, non-interactive status card shown after the host loading layer settles. */
 @Composable
 internal fun InjectionIntro(
     visible: Boolean,

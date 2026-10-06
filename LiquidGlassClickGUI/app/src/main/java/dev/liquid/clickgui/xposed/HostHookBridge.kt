@@ -26,9 +26,6 @@ interface HostHookCallbacks {
     fun onTouchEvent(event: MotionEvent): Boolean = false
 }
 
-/**
- * Hook 与具体功能之间的稳定边界。回调运行在目标进程，默认实现不会拦截输入。
- */
 object HostHookBridge {
     private object NoOpCallbacks : HostHookCallbacks
 

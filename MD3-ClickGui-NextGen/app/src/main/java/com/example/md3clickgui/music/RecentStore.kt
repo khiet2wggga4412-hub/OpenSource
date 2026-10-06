@@ -5,10 +5,6 @@ import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
 
-/**
- * Local, on-device "recently played" history. Kept deliberately independent of the NetEase account
- * so it always works, even when logged out. MusicPlayer reports each played track here.
- */
 object RecentStore {
     private const val MAX = 200
     private const val KEY = "recent_songs"

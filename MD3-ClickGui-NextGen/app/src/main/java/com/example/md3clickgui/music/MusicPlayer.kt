@@ -23,11 +23,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 
-/**
- * Process-wide singleton player. Keeping it out of the Compose lifecycle lets playback survive the
- * Music panel closing, and a foreground service (started while audio is active) keeps the app alive
- * in the background / with the screen off. UI observes its Compose state directly.
- */
 object MusicPlayer {
 
     var currentSong by mutableStateOf<Song?>(null)
@@ -52,28 +47,26 @@ object MusicPlayer {
     private val scopeJob = SupervisorJob()
     private val scope = CoroutineScope(scopeJob + Dispatchers.IO)
 
-    /** The in-flight resolve/prepare; cancelled per play() so stale requests stop early. */
     private var playJob: Job? = null
     private var playToken = 0
 
-    /** True only while playback is paused by a transient focus loss and may resume on regain. */
     private var resumeOnFocusGain = false
 
     private val focusChangeListener = AudioManager.OnAudioFocusChangeListener { change ->
         when (change) {
             AudioManager.AUDIOFOCUS_LOSS -> {
-                // Permanent loss: another app owns audio now. Stop holding focus so it can play.
+
                 pauseForFocusLoss()
                 abandonAudioFocus()
                 releaseWakeLock()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                // Keep the focus request: AUDIOFOCUS_GAIN arrives when the interruption ends.
+
                 resumeOnFocusGain = isPlaying
                 pauseForFocusLoss()
             }
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> {
-                // Music content: ducking is handled by the system mixer, nothing to do here.
+
             }
             AudioManager.AUDIOFOCUS_GAIN -> {
                 if (resumeOnFocusGain) {
@@ -106,8 +99,7 @@ object MusicPlayer {
         startKeepAlive()
 
         playJob = scope.launch {
-            // startKeepAlive() runs after stopAndRelease(): everything it takes must be undone
-            // here, or a failed resolve leaves a foreground service, a wake lock and audio focus held.
+
             var ownsKeepAlive = true
             try {
                 val url = NeteaseMusicApi.songUrl(song.id)
@@ -160,7 +152,7 @@ object MusicPlayer {
                         )
                     )
                     next.prepareAsync()
-                    // No callback ever arrives for a dead stream; fail instead of buffering forever.
+
                     withTimeoutOrNull(timeMillis = PrepareTimeoutMs) {
                         while (player === next && isBuffering) delay(250)
                     }
@@ -179,13 +171,12 @@ object MusicPlayer {
                     stopAndRelease()
                 }
             } finally {
-                // A superseded request must not leave the foreground service running.
+
                 if (ownsKeepAlive && token != playToken && player == null) stopKeepAlive()
             }
         }
     }
 
-    /** Resumes the prepared player without re-resolving the stream. */
     private fun startPlayback() {
         val p = player ?: return
         runCatching { p.start() }
@@ -215,7 +206,6 @@ object MusicPlayer {
         positionMs = target
     }
 
-    /** Reads live position/duration from the underlying player; called on a periodic tick. */
     fun syncPosition() {
         val p = player ?: return
         if (p.isPlaying) {
@@ -224,18 +214,11 @@ object MusicPlayer {
         }
     }
 
-    /**
-     * Tears the whole player down. Deliberately does **not** cancel [scope]: the scope belongs to
-     * this process-wide singleton, so cancelling it here (the notification Stop action calls this)
-     * would silently kill every later [play] — the launched coroutine never runs and playback stays
-     * buffering forever.
-     */
     fun release() {
         stopAndRelease()
         stopKeepAlive()
     }
 
-    /** Cancels the in-flight resolve/prepare and returns the new generation token. */
     private fun stopAndRelease(): Int {
         playToken++
         playJob?.cancel()
@@ -268,8 +251,7 @@ object MusicPlayer {
                     .setAction(MusicPlaybackService.ACTION_PLAY)
             )
         } catch (_: Exception) {
-            // Foreground start is refused while the app is backgrounded on Android 12+;
-            // playback itself still works, so this is not fatal.
+
         }
         requestAudioFocus()
         acquireWakeLock()
@@ -282,7 +264,6 @@ object MusicPlayer {
         runCatching { appContext.stopService(Intent(appContext, MusicPlaybackService::class.java)) }
     }
 
-    /** One request object for the process: re-requesting the same focus is idempotent. */
     private fun requestAudioFocus() {
         val am = audioManager ?: return
         val request = focusRequest ?: AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)

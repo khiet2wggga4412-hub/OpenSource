@@ -49,7 +49,6 @@ import com.example.md3clickgui.ui.theme.NexusIconShape
 import com.example.md3clickgui.ui.theme.NexusSpacing
 import com.example.md3clickgui.ui.theme.NexusMotion
 
-/** Navigation occupies its own column, including its expand/collapse button. */
 @Composable
 fun CategoryRail(
     modifier: Modifier = Modifier,
@@ -64,7 +63,7 @@ fun CategoryRail(
 ) {
     val colors = MaterialTheme.colorScheme
     val selection = rememberSlidingSelection(sections.getOrNull(selectedIndex)?.id, colors.secondaryContainer, colors.surfaceContainer)
-    // Sections that hold their place at the bottom of the rail, in catalog order (Music, Config).
+
     val pinnedIds = setOf(SectionIds.MUSIC, SectionIds.CONFIG)
     val labelAlpha by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
@@ -89,13 +88,7 @@ fun CategoryRail(
                     }
             }
             Spacer(Modifier.height(NexusSpacing.extraSmall))
-            // Two sibling groups, and the order matters: the scrolling categories are drawn first and
-            // the anchored ones (Music, Config) after them, so the anchored rows sit in the upper
-            // layer. The selection indicator therefore slides *underneath* them and is hidden by them
-            // on its way past, which is the intended rail behaviour.
-            //
-            // The scrolling group keeps its own clip: without it the indicator would be drawn outside
-            // the scroll viewport as it travels, which is what cut a flat edge into it before.
+
             Column(with(selection) { Modifier.weight(1f).fillMaxWidth().selectionContainer() }) {
                 Box(Modifier.weight(1f).fillMaxWidth().clipToBounds().verticalScroll(rememberScrollState())) {
                     Column(verticalArrangement = Arrangement.spacedBy(NexusDimensions.rowGap)) {
@@ -108,8 +101,7 @@ fun CategoryRail(
                 }
             }
             Spacer(Modifier.height(NexusSpacing.extraSmall))
-            // Outside the selection container: these rows are never washed or covered by it, and they
-            // paint over it because they come later in the parent's draw order.
+
             sections.forEachIndexed { index, section ->
                 if (section.id in pinnedIds) {
                     CategoryItem(section, index == selectedIndex, expanded, labelAlpha, selection, languageIndex,
@@ -128,8 +120,7 @@ private fun CategoryItem(section: GuiSection, isSelected: Boolean, expanded: Boo
         if (isSelected) colors.onSecondaryContainer else colors.onSurfaceVariant,
         NexusMotion.colorSpec(), label = "categoryContentColor"
     )
-    // The anchored rows carry no selected background: the indicator deliberately stays on the last
-    // scrolling card, and a second highlight here would read as the indicator having moved.
+
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth().height(NexusDimensions.categoryItem).semantics { selected = isSelected },
@@ -137,8 +128,7 @@ private fun CategoryItem(section: GuiSection, isSelected: Boolean, expanded: Boo
         color = Color.Transparent,
         contentColor = contentColor
     ) {
-        // Anchored rows are registered as non-slidable: the indicator never travels to them, so
-        // selecting Music or Config leaves it resting where it was.
+
         val rowModifier = with(selection) {
             Modifier.fillMaxSize().selectionRow(section.id, slidable = !outsideContainer)
         }

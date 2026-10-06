@@ -11,11 +11,6 @@ import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/*
- * Combat cards. Plain [ModuleBinding.Standard] modules: the enable switch in the module list is the
- * module's on/off state, and every setting below it is editable in the details column.
- */
-
 object KillAuraModule : ModuleDefinition {
     private const val ID = "combat.killaura"
 

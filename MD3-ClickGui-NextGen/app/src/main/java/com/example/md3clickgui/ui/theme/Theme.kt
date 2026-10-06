@@ -15,7 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.md3clickgui.ui.theme.NexusMotion
 import kotlin.math.pow
 
-/** Default theme colors shown above the custom color drawer. */
 val NexusThemeSwatchColors = listOf(
     Color(0xFF176B60),
     Color(0xFF315F90),
@@ -27,7 +26,6 @@ val NexusThemeSwatchNames = listOf(
     "Nexus", "Ocean", "Violet", "Sunset"
 )
 
-/** Hex values matching [NexusThemeSwatchColors], used by the color picker state. */
 val NexusThemeSwatchHexes = listOf(
     "#176B60", "#315F90", "#6750A4", "#95513C"
 )
@@ -208,8 +206,7 @@ fun NexusTheme(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    // Manual swatches and the custom picker must win over system dynamic colors.
-    // Dynamic color remains available when no manual theme override is active.
+
     val hasManualTheme = customColorHex != null || themeIndex != 0
     val useDynamic = dynamicColor && !hasManualTheme && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S
     val colors = when {
@@ -292,9 +289,7 @@ fun NexusTheme(
     }
     MaterialExpressiveTheme(
         colorScheme = colors,
-        // Inert for this app: every hand-authored animation passes its own NexusMotion spec, so the
-        // scheme only reaches Material 3's internal component motion (slider and menu internals).
-        // Kept explicit rather than relying on the parameter's default.
+
         motionScheme = MotionScheme.standard(),
     ) {
         CompositionLocalProvider(LocalRippleConfiguration provides null, content = content)

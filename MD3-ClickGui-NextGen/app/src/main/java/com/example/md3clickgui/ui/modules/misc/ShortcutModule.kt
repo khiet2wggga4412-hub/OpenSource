@@ -8,7 +8,6 @@ import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/** Global style and size for the per-module floating shortcuts, exposed in Misc. */
 object ShortcutModule : ModuleDefinition {
     private const val ID = "misc.shortcut"
 

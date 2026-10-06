@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -26,7 +21,6 @@ import java.util.Map;
 public final class LiquidBounceDataStore {
     public enum BindsVisibility { ALL_BOUND, ENABLED_BOUND }
 
-    /** Single state-change stream consumed by every visual projection of a module. */
     public interface ModuleStateListener {
         void onModuleEnabledChanged(ModuleEntry module, boolean enabled);
         void onModuleMetadataChanged(ModuleEntry module);
@@ -155,7 +149,6 @@ public final class LiquidBounceDataStore {
         store.addCategory("player", "Player", panelX[4], panelY);
         store.addCategory("misc", "Misc", panelX[5], panelY);
 
-        // HUD Editor and Settings are regular Misc modules in the ClickGUI.
         ModuleEntry hudEditor = store.addModule("misc.hud_editor", "HUD Editor", "misc").settings(
                 new ToggleSetting("hud_array", "ArrayList", true),
                 new ToggleSetting("hud_binds", "Binds", true),
@@ -175,7 +168,6 @@ public final class LiquidBounceDataStore {
         interfaceSettings.showInArrayList = false;
         interfaceSettings.showInBinds = false;
 
-        // ── 战斗 Combat ─────────────────────────────────────────────────
         store.addModule("combat.kill_aura", "KillAura", "combat").settings(
                 new SliderSetting("attack_range", "Attack Range", 1, 6, 3.2f, "blocks"),
                 new SliderSetting("cps", "CPS", 1, 20, 8, "cps"),
@@ -218,7 +210,6 @@ public final class LiquidBounceDataStore {
                 new DropdownSetting("mode", "Mode", "Normal", "Normal", "Legit", "Teleport", "FakeLag"),
                 new SliderSetting("delay", "Delay", 0, 40, 10, "ticks"));
 
-        // ── 移动 Movement ────────────────────────────────────────────────
         store.addModule("movement.fly", "Fly", "movement").settings(
                 new DropdownSetting("mode", "Mode", "Normal", "Normal", "Teleport", "Glide", "ZoomFly"),
                 new SliderSetting("speed", "Speed", .1f, 5, 1, "x"),
@@ -263,7 +254,6 @@ public final class LiquidBounceDataStore {
         store.addModule("movement.click_tp", "ClickTP", "movement").settings(
                 new ToggleSetting("through_walls", "Through Walls", false));
 
-        // ── 世界 World ───────────────────────────────────────────────────
         store.addModule("world.area_break", "AreaBreak", "world").settings(
                 new SliderSetting("radius", "Radius", 1, 6, 4, "blocks"),
                 new ToggleSetting("smart_filter", "Smart Filter", true),
@@ -294,7 +284,6 @@ public final class LiquidBounceDataStore {
         store.addModule("world.griefing", "Griefing", "world").settings(
                 new DropdownSetting("method", "Method", "Lag", "Lag", "Crash", "Kick"));
 
-        // ── 杂项 Misc ────────────────────────────────────────────────────
         store.addModule("misc.anti_kick", "AntiKick", "misc").settings(
                 new ToggleSetting("timeout", "Timeout Protection", true),
                 new ToggleSetting("packet", "Packet Protection", true));
@@ -319,7 +308,6 @@ public final class LiquidBounceDataStore {
         store.addModule("misc.music_player", "MusicPlayer", "misc").settings(
                 new SliderSetting("volume", "Volume", 0, 100, 50, "%"));
 
-        // ── 玩家 Player ─────────────────────────────────────────────────
         store.addModule("player.suicide_aura", "SuicideAura", "player").settings(
                 new SliderSetting("range", "Range", 1, 8, 4, "blocks"),
                 new ToggleSetting("suicide_mode", "Suicide Mode", false));
@@ -342,8 +330,7 @@ public final class LiquidBounceDataStore {
                 new ToggleSetting("effects", "Effects", true));
         store.addModule("player.no_hurt_cam", "NoHurtCam", "player");
         store.addModule("player.name_protect", "NameProtect", "player");
-        // ── 渲染 Render ──────────────────────────────────────────────────
-        // HUD Binds 面板的独立显示开关；它本身不应出现在 ArrayList 或 Binds 列表中。
+
         ModuleEntry bindsPanel = store.addModule("render.binds", "Binds", "render");
         bindsPanel.showInArrayList = false;
         bindsPanel.showInBinds = false;
@@ -382,7 +369,7 @@ public final class LiquidBounceDataStore {
         store.addModule("render.hit_color", "HitColor", "render").settings(
                 new ColorSetting("color", "Hit Color", 0xFFFF5A5A, false),
                 new SliderSetting("duration", "Duration", 0, 3, 1, "s"));
-        // 清单外保留
+
         store.addModule("render.jump_circle", "Jump Circle", "render").settings(
                 new ColorSetting("color", "Color", 0xFF3C69FC, false),
                 new SliderSetting("duration", "Duration", 0, 2, 1, "s"));

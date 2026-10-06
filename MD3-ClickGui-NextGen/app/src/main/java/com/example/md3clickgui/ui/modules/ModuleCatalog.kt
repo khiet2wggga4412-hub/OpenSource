@@ -41,7 +41,6 @@ import com.example.md3clickgui.ui.modules.world.FastPlaceModule
 import com.example.md3clickgui.ui.modules.world.LiquidsModule
 import com.example.md3clickgui.ui.modules.world.NukerModule
 
-/** Stable section identifiers referenced by module definitions. */
 object SectionIds {
     const val AI = "ai"
     const val COMBAT = "combat"
@@ -60,7 +59,6 @@ private data class SectionTemplate(
     val icon: ImageVector
 )
 
-/** Ordered section shell; modules attach via [ModuleDefinition.sectionId]. */
 private val sectionTemplates = listOf(
     SectionTemplate(SectionIds.AI, "AI", Icons.Default.AutoFixHigh),
     SectionTemplate(SectionIds.COMBAT, "Combat", Icons.Default.Bolt),
@@ -73,46 +71,39 @@ private val sectionTemplates = listOf(
     SectionTemplate(SectionIds.CONFIG, "Config", Icons.Default.Folder)
 )
 
-/**
- * The single registration point for module cards.
- *
- * Add a card: create a `ModuleDefinition` object and append it here.
- * Remove a card: delete its entry (and its file).
- * Card order within a section follows this list.
- */
 val allModuleDefinitions: List<ModuleDefinition> = listOf(
-    // Combat
+
     KillAuraModule,
     CriticalsModule,
     VelocityModule,
     AutoClickerModule,
     AntiKnockbackModule,
-    // Movement
+
     SprintModule,
     ScaffoldModule,
     FlyModule,
     SpeedModule,
     NoFallModule,
-    // World
+
     NukerModule,
     AutoBuildModule,
     FastPlaceModule,
     LiquidsModule,
-    // Player
+
     AutoTotemModule,
     AutoEatModule,
     ChestStealerModule,
     AutoToolModule,
-    // Visual
+
     ArrayListModule,
     EspModule,
     TracersModule,
     CameraModule,
-    // Misc
+
     ThemeModule,
     LanguageModule,
     ShortcutModule,
-    // Music
+
     MusicModule,
     FeaturedModule,
     RecentModule
@@ -137,5 +128,4 @@ private fun buildSections(): List<GuiSection> {
     }
 }
 
-/** Ordered category list consumed by navigation and the module content screen. */
 val guiSections: List<GuiSection> = buildSections()

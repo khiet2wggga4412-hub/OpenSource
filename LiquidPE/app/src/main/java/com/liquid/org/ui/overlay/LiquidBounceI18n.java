@@ -1,19 +1,9 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 全局中英切换。模块名按「模块 id」翻译(避免 Timer/Speed/Chat 等与设置项同名的歧义);
- * 分类、设置名、枚举选项、界面文案按「英文串」翻译;未收录的串回退英文。
- * 搜索框文本刻意不经过这里,保持英文。
- */
 public final class LiquidBounceI18n {
     private static boolean chinese;
     private static final Map<String, String> MODULES = new HashMap<>();
@@ -24,19 +14,16 @@ public final class LiquidBounceI18n {
     public static boolean isChinese() { return chinese; }
     public static void setChinese(boolean value) { chinese = value; }
 
-    /** Register every new user-facing string once, then use t(key) everywhere. */
     public static void register(String english, String chineseText) {
         if (english != null && chineseText != null) ZH.put(english, chineseText);
     }
 
-    /** 模块显示名:优先按模块 id 查中文表。 */
     public static String moduleName(String moduleId, String fallback) {
         if (!chinese || moduleId == null) return fallback;
         String zh = MODULES.get(moduleId);
         return zh != null ? zh : fallback;
     }
 
-    /** 通用字符串翻译:分类名、设置名、枚举选项、单位、界面文案。 */
     public static String t(String en) {
         if (en == null || !chinese) return en;
         String zh = ZH.get(en);
@@ -44,7 +31,7 @@ public final class LiquidBounceI18n {
     }
 
     static {
-        // ── 界面文案 ──
+
         ZH.put("HUD Editor", "HUD 编辑");
         ZH.put("Settings", "设置");
         ZH.put("Binds", "按键");
@@ -124,7 +111,6 @@ public final class LiquidBounceI18n {
         ZH.put("Delete failed", "删除失败");
         ZH.put("aka", "别名");
 
-        // ── 分类名 ──
         ZH.put("Combat", "战斗");
         ZH.put("Movement", "移动");
         ZH.put("World", "世界");
@@ -132,7 +118,6 @@ public final class LiquidBounceI18n {
         ZH.put("Player", "玩家");
         ZH.put("Misc", "杂项");
 
-        // ── 通用设置名 / 单位 ──
         ZH.put("Bind", "绑定键");
         ZH.put("Mode", "模式");
         ZH.put("Speed", "速度");
@@ -160,7 +145,6 @@ public final class LiquidBounceI18n {
         ZH.put("%", "%");
         ZH.put("°", "°");
 
-        // ── 新增设置名 / 选项 ──
         ZH.put("Zoom FOV", "缩放视角联动");
         ZH.put("Detect", "检测");
         ZH.put("Teammates", "队友");
@@ -169,7 +153,6 @@ public final class LiquidBounceI18n {
         ZH.put("Spark", "火花");
         ZH.put("Cloud", "云");
 
-        // ── 模块名(按 id)──
         MODULES.put("combat.kill_aura", "杀戮光环");
         MODULES.put("combat.auto_aim", "自动瞄准");
         MODULES.put("combat.auto_click", "自动点击");
@@ -239,7 +222,6 @@ public final class LiquidBounceI18n {
         MODULES.put("render.jump_circle", "跳跃圈");
         MODULES.put("render.binds", "按键");
 
-        // ── Combat 设置与选项 ──
         ZH.put("Clicker", "点击器");
         ZH.put("Simulate Click", "模拟点击");
         ZH.put("Chance", "几率");
@@ -310,7 +292,6 @@ public final class LiquidBounceI18n {
         ZH.put("Random Direction", "随机方向");
         ZH.put("Players Only", "仅玩家");
 
-        // ── Movement 设置与选项 ──
         ZH.put("Vanilla", "原版");
         ZH.put("Glide", "滑翔");
         ZH.put("Jetpack", "喷气背包");
@@ -342,7 +323,6 @@ public final class LiquidBounceI18n {
         ZH.put("Fall Speed", "下落速度");
         ZH.put("Auto Glide", "自动滑翔");
 
-        // ── World 设置与选项 ──
         ZH.put("Radius", "破坏半径");
         ZH.put("Blocks", "方块");
         ZH.put("Stone", "石头");
@@ -392,7 +372,6 @@ public final class LiquidBounceI18n {
         ZH.put("Lag", "卡顿");
         ZH.put("Kick", "踢出");
 
-        // ── Player 设置与选项 ──
         ZH.put("Quality", "品质");
         ZH.put("Defense", "防御力");
         ZH.put("Replace Damaged", "替换损坏装备");
@@ -426,7 +405,6 @@ public final class LiquidBounceI18n {
         ZH.put("Main Hand", "主手");
         ZH.put("Off Hand", "副手");
 
-        // ── Render 设置与选项 ──
         ZH.put("Lapis", "青金石");
         ZH.put("Targets", "目标类型");
         ZH.put("Animals", "动物");
@@ -455,7 +433,6 @@ public final class LiquidBounceI18n {
         ZH.put("Smooth Zoom", "平滑缩放");
         ZH.put("Hit Color", "受击颜色");
 
-        // ── Misc 设置与选项 ──
         ZH.put("Messages", "消息列表");
         ZH.put("Randomize", "随机化");
         ZH.put("Anticheats", "反作弊系统");
@@ -484,7 +461,7 @@ public final class LiquidBounceI18n {
         ZH.put("Theme", "主题");
         ZH.put("Dark", "深色");
         ZH.put("Light", "浅色");
-        // ── 新增设置/选项翻译(按当前清单版本)──
+
         ZH.put("Target Priority", "目标优先级");
         ZH.put("Click Type", "点击类型");
         ZH.put("Left", "左键");

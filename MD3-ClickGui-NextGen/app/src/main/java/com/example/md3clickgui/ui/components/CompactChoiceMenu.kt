@@ -68,7 +68,6 @@ import com.example.md3clickgui.ui.language.uiText
 import com.example.md3clickgui.ui.theme.NexusMotion
 import kotlin.math.roundToInt
 
-/** An anchored menu that reveals its rows without moving the settings underneath. */
 @Composable
 internal fun CompactChoiceMenu(
     options: List<String>,
@@ -105,7 +104,6 @@ internal fun CompactChoiceMenu(
         }
     }
 
-    // Commit the value on the click; keep only the visual exit alive until it finishes.
     LaunchedEffect(popupMounted, visibility.isIdle, visibility.currentState, visibility.targetState) {
         if (popupMounted && visibility.isIdle && !visibility.currentState && !visibility.targetState) {
             popupMounted = false

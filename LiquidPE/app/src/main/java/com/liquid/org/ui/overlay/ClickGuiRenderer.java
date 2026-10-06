@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -43,7 +38,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public final class ClickGuiRenderer {
-    /* 默认位置仅用于首次打开；之后每个面板都保存自己的自由画布坐标。 */
+
     private static final int PANEL_GRID_COLUMNS = 7;
     private static final float PANEL_GRID_LEFT = 30f;
     private static final float PANEL_GRID_TOP = 194f;
@@ -130,7 +125,7 @@ public final class ClickGuiRenderer {
     private final Path path = new Path();
     private final SettingHit[] settingHits = new SettingHit[128];
     private int settingHitCount;
-    /* Setting hit rectangles are recorded after the owning panel transform. */
+
     private CategoryPanel hitPanel;
     private float hitScale = 1f;
     private SettingHit activeHit;
@@ -220,7 +215,6 @@ public final class ClickGuiRenderer {
         canvas.restoreToCount(pageSave);
     }
 
-    /** HUD editor and interface settings live in the ClickGUI utility rail. */
     private void drawIntegratedControls(Canvas canvas, long now) {
         setFill(LiquidBounceUiColors.PANEL_DEEP); rect.set(UTILITY_LEFT, UTILITY_TOP, UTILITY_RIGHT, UTILITY_BOTTOM); canvas.drawRoundRect(rect, 9, 9, fill);
         setFill(LiquidBounceUiColors.ACCENT); canvas.drawRect(UTILITY_LEFT, UTILITY_BOTTOM - 3, UTILITY_RIGHT, UTILITY_BOTTOM, fill);
@@ -538,7 +532,7 @@ public final class ClickGuiRenderer {
             canvas.clipRect(panel.x, panel.y + PANEL_CONTENT_TOP,
                     panel.x + LiquidBounceUiMetrics.PANEL_WIDTH, panel.y + panelHeight);
             float maxScroll = Math.max(0, panel.contentHeight - bodyViewportHeight);
-            // 搜索或折叠设置后内容可能立即变短，先同步截断当前位置，避免出现短暂空白区域。
+
             panel.scrollOffset = clamp(panel.scrollOffset, 0, maxScroll);
             panel.targetScrollOffset = clamp(panel.targetScrollOffset, 0, maxScroll);
             panel.scrollOffset += (panel.targetScrollOffset - panel.scrollOffset) * .28f;
@@ -566,7 +560,6 @@ public final class ClickGuiRenderer {
         canvas.restoreToCount(save);
     }
 
-    /** 单一内容尺寸来源：仅统计搜索后仍可见模块及其当前展开的设置项。 */
     private float calculateContentHeight(CategoryPanel panel, long now) {
         float height = 0;
         for (ModuleEntry module : panel.modules) if (matches(module.name)) {
@@ -576,10 +569,8 @@ public final class ClickGuiRenderer {
         return height > 0 ? height + PANEL_CONTENT_BOTTOM_PADDING : 0;
     }
 
-    /** 最大高度随面板当前位置和当前可用屏幕高度变化，不再来自分类的固定高度。 */
     private float calculateAvailableBodyHeight(CategoryPanel panel) {
-        // Each panel owns a stable center anchor. Reserve the bottom inset in
-        // physical canvas coordinates, then convert it to panel space.
+
         float scale = panelScale(panel);
         float anchorY = panelAnchorY(panel);
         return Math.max(0, (LiquidBounceUiMetrics.CONTENT_HEIGHT - PANEL_SCREEN_BOTTOM_INSET - anchorY) / scale
@@ -614,7 +605,6 @@ public final class ClickGuiRenderer {
         return panelAnchorY(panel) + (y - panelAnchorY(panel)) / panelScale(panel);
     }
 
-    /** 所有视觉、裁剪和触摸边界均使用该动态总高度。 */
     private float calculatePanelHeight(CategoryPanel panel, long now) {
         panel.contentHeight = calculateContentHeight(panel, now);
         return PANEL_CONTENT_TOP + Math.min(panel.contentHeight, calculateAvailableBodyHeight(panel)) * panel.expansion.get(now);
@@ -819,7 +809,7 @@ public final class ClickGuiRenderer {
             float height = calculatePanelHeight(panel, android.os.SystemClock.uptimeMillis());
             if (containsPanelPoint(panel, x, y, height)) {
                 scrollPanel = panel;
-                /* 标题栏既是面板的空白拖拽区域，也是短按展开/收起的原有入口。 */
+
                 if (unscalePanelY(panel, y) <= panel.y + LiquidBounceUiMetrics.PANEL_HEADER_HEIGHT) {
                     pressedPanel = panel;
                     longPressHandler.postDelayed(longPressRunnable, android.view.ViewConfiguration.getLongPressTimeout());
@@ -1013,7 +1003,6 @@ public final class ClickGuiRenderer {
         }
     }
 
-    /** Bridges the Misc utility modules to the existing HUD and overlay projections. */
     private void syncSpecialSetting(SettingEntry setting) {
         if (setting instanceof ToggleSetting) {
             boolean value = ((ToggleSetting) setting).value;
@@ -1059,7 +1048,6 @@ public final class ClickGuiRenderer {
         updatePanelDrag(x, y);
     }
 
-    /** 拖动时直接使用手指位置，不进行网格吸附或面板碰撞规避。 */
     private void updatePanelDrag(float x, float y) {
         if (layoutDraggingPanel == null || layoutDraggingPanel.layoutInfo == null) return;
         CategoryPanel panel = layoutDraggingPanel;
@@ -1097,12 +1085,12 @@ public final class ClickGuiRenderer {
                 panel.y = clamp(saved.freeY, PANEL_GRID_TOP, LiquidBounceUiMetrics.CONTENT_HEIGHT - PANEL_CONTENT_TOP);
                 panel.layoutInfo.setFreePosition(panel.x, panel.y);
             } else {
-                // 兼容旧版网格布局：第一次升级时转换为对应的自由坐标。
+
                 panel.x = gridToX(Math.max(0, Math.min(PANEL_GRID_COLUMNS - panel.layoutInfo.spanX, saved.gridX)));
                 panel.y = gridToY(Math.max(0, saved.gridY));
                 panel.layoutInfo.setFreePosition(panel.x, panel.y);
             }
-            // The first view must expose the module lists; the original header toggle still controls them afterwards.
+
             panel.expanded = true;
             panel.expansion.snapTo(1f);
         }

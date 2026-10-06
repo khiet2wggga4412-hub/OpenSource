@@ -11,7 +11,6 @@ import kotlin.math.PI
 import kotlin.math.exp
 import kotlin.math.sin
 
-/** Small synthesized UI chimes: ascending for ON, descending for OFF. */
 internal object ModuleSwitchSoundPlayer {
     private const val SAMPLE_RATE = 44_100
     private const val DURATION_SECONDS = 0.24f

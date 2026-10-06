@@ -67,7 +67,6 @@ import dev.liquid.clickgui.ui.LocalGlassPalette
 import dev.liquid.clickgui.ui.UiLanguage
 import kotlin.math.roundToInt
 
-/** 与 Kyant0 catalog DialogContent 相同的 blur + lens + colorControls 组合。 */
 @Composable
 fun LiquidModuleDialog(
     visible: Boolean,

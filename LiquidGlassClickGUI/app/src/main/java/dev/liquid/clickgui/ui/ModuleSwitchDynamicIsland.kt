@@ -104,9 +104,6 @@ private sealed interface IslandContent {
     }
 }
 
-/**
- * 常驻顶部的只读灵动岛。新通知从上方进入，上一条向下挤出；宽度跟随完整文字平滑变化。
- */
 @Composable
 fun ModuleSwitchDynamicIsland(
     coordinator: ModuleSwitchNoticeCoordinator,

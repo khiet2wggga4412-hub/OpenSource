@@ -9,11 +9,6 @@ import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
-/*
- * Visual cards. The ArrayList card (see ArrayListModule) lists every enabled standard module, so
- * these exist partly to give that list realistic content.
- */
-
 object EspModule : ModuleDefinition {
     private const val ID = "visual.esp"
 

@@ -54,12 +54,10 @@ import com.example.md3clickgui.ui.theme.NexusTheme
 import com.example.md3clickgui.ui.theme.NexusMotion
 import androidx.compose.ui.unit.IntOffset
 
-/** The screen shell; module definitions and window state live in feature components. */
 @Composable
 fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSections) {
     val colors = MaterialTheme.colorScheme
-    // Panel visibility fades and scales, so it takes the effects token. The window slide takes the
-    // spatial token; both come straight from the scheme installed in NexusTheme.
+
     val panelVisibilitySpec = NexusMotion.enterSpec<Float>()
     val panelExitSpec = NexusMotion.exitSpec<Float>()
     val windowSlideSpec = NexusMotion.enterSpec<Float>()
@@ -186,7 +184,7 @@ fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSection
             state = state,
             modifier = Modifier.fillMaxSize()
         )
-        // Read-only overlay: takes no pointer input, so it cannot block the workspace under it.
+
         ArrayListHudLayer(
             state = state,
             sections = sections,
@@ -195,7 +193,6 @@ fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSection
     }
 }
 
-/** Single state-driven theme entry point shared by the activity and interactive previews. */
 @Composable
 fun NexusClickGui(state: ClickGuiState) {
     NexusTheme(

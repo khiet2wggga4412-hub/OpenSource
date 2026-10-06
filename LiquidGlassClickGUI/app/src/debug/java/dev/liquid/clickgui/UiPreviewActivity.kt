@@ -13,7 +13,6 @@ import dev.liquid.clickgui.ui.ClickGuiController
 import dev.liquid.clickgui.ui.LiquidClickGuiScreen
 import dev.liquid.clickgui.ui.PersistentHudOverlay
 
-/** Debug-only visual harness. It is not packaged in release builds. */
 class UiPreviewActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

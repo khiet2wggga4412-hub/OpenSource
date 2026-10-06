@@ -32,7 +32,6 @@ import com.kyant.backdrop.Backdrop
 import dev.liquid.clickgui.ui.GlassTypography
 import dev.liquid.clickgui.ui.LocalGlassPalette
 
-/** Stable flat variant of Kyant's sliding navigation, shared by all enum settings. */
 @Suppress("UNUSED_PARAMETER")
 @Composable
 fun LiquidSegmentedNavigation(

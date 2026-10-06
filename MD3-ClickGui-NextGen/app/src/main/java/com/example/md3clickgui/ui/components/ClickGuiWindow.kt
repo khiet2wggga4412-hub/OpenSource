@@ -85,15 +85,8 @@ import androidx.compose.ui.unit.IntOffset
 
 private val NexusInputBorderThickness = 2.dp
 
-/**
- * Label for the panel's close action. Single source of truth: it appears as a button in the config
- * and login panes, as an icon on module details, and in the music panels. The value doubles as the
- * `uiText` lookup key, so [com.example.md3clickgui.ui.language.UiStrings] carries a translation for
- * exactly this string.
- */
 internal const val ClosePanelLabel = "Close Material panel"
 
-/** Three aligned columns with independent scrolling and shared motion. */
 @Composable
 fun ClickGuiWindow(
     state: ClickGuiState,
@@ -107,8 +100,7 @@ fun ClickGuiWindow(
     val section = sections[safeSectionIndex]
     val isConfigSection = section.id == SectionIds.CONFIG
     val modulesById = remember(sections) { sections.flatMap { it.modules }.associateBy { it.id } }
-    // Module id -> its section name. Doubles as the per-row subtitle and as the group header the
-    // list shows when a search mixes modules from several sections.
+
     val categoryNames = remember(sections) {
         sections.flatMap { category -> category.modules.map { it.id to category.name } }.toMap()
     }
@@ -155,8 +147,7 @@ fun ClickGuiWindow(
                 sections = sections, languageIndex = state.languageIndex,
                 accountName = state.accountName, accountExpiryText = state.accountExpiryText
             )
-            // Read outside the AnimatedContent lambdas: transitionSpec is not a composable scope, so
-            // the scheme cannot be consulted from inside it.
+
             val enterFadeSpec = NexusMotion.enterSpec<Float>()
             val enterExitFadeSpec = NexusMotion.exitSpec<Float>()
             val enterSlideSpec = NexusMotion.enterSpec<IntOffset>()
@@ -254,8 +245,7 @@ private fun ModuleListPanel(
     searchQuery: String, onSearchQueryChange: (String) -> Unit
 ) {
     val colors = MaterialTheme.colorScheme
-    // languageIndex is read inside the derived state, so it has to be a key of the block that
-    // builds it — otherwise switching language would leave the translated names stale.
+
     val filteredModules by remember(section, allModules, searchQuery, state.languageIndex) {
         derivedStateOf {
             val query = searchQuery.trim()
@@ -271,8 +261,7 @@ private fun ModuleListPanel(
     }
     val selection = rememberSlidingSelection(state.selectedModuleId?.takeIf { state.isDetailsPanelOpen && filteredModules.any { module -> module.id == it } },
         colors.primaryContainer, colors.surfaceContainer)
-    // A search mixes sections, so the rows are grouped under a header per category. Inside a single
-    // category the header would just repeat the column title, so it is only shown for search results.
+
     val groupedModules = if (searchQuery.isBlank()) {
         listOf(section.name to filteredModules)
     } else {
@@ -294,7 +283,7 @@ private fun ModuleListPanel(
                     Modifier.weight(0.54f), fieldHeight = NexusDimensions.controlHeight)
             }
             Spacer(Modifier.height(NexusDimensions.rowGap))
-            // The selection and its rows share content coordinates, so scrolling does not move the indicator separately.
+
             Box(Modifier.weight(1f).clipToBounds().verticalScroll(rememberScrollState())) {
                 Column(with(selection) { Modifier.fillMaxWidth().selectionContainer() }, verticalArrangement = Arrangement.spacedBy(NexusDimensions.rowGap)) {
                     if (filteredModules.isEmpty()) {

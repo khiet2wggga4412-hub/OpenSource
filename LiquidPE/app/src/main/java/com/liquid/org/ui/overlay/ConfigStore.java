@@ -26,7 +26,6 @@ import com.liquid.org.ui.overlay.LiquidBounceModels.SettingGroup;
 import com.liquid.org.ui.overlay.LiquidBounceModels.SliderSetting;
 import com.liquid.org.ui.overlay.LiquidBounceModels.ToggleSetting;
 
-/** App-private JSON configuration manager used by the in-game Config page. */
 public final class ConfigStore {
     private final File directory;
     private final File exportDirectory;

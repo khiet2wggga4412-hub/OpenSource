@@ -7,7 +7,6 @@ import dev.liquid.clickgui.model.FloatSetting
 import dev.liquid.clickgui.model.IntSetting
 import dev.liquid.clickgui.model.ModuleUiModel
 
-/** SharedPreferences-backed storage for the UI-only ClickGUI configuration. */
 class ClickGuiConfigStore(context: Context) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 

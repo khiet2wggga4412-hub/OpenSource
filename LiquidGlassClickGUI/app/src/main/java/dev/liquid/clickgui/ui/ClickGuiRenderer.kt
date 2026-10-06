@@ -11,21 +11,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import java.lang.ref.WeakReference
 
-/** ClickGUI 根背景的渲染模式。 */
 enum class ClickGuiBackgroundMode {
-    /** 默认模式：GUI 根层只绘制一次纯白背景。 */
+
     SolidWhite,
 
-    /** Android 12+：模糊宿主 Activity 的内容层，再覆盖半透明白色玻璃层。 */
     GaussianBlur,
 }
 
-/**
- * ClickGUI 的统一渲染配置入口。
- *
- * 外部可调用 [useSolidWhite] 或 [useGaussianBlur] 切换背景。宿主注入层只会模糊
- * android.R.id.content，不会把后挂载到 DecorView 的 Compose GUI 一起模糊。
- */
 @Stable
 object ClickGuiRenderer {
     var backgroundMode by mutableStateOf(ClickGuiBackgroundMode.SolidWhite)
@@ -49,7 +41,6 @@ object ClickGuiRenderer {
         backgroundMode = mode
     }
 
-    /** 由宿主悬浮层在主面板展开状态变化或渲染配置变化时调用。 */
     internal fun updateHostEffect(activity: Activity, overlayExpanded: Boolean) {
         val content = activity.findViewById<View>(android.R.id.content) ?: return
         val previous = blurredHostContent.get()
@@ -75,7 +66,6 @@ object ClickGuiRenderer {
         }
     }
 
-    /** detach、收起或异常退出时必须调用，防止游戏画面残留模糊。 */
     internal fun clearHostEffect() {
         blurredHostContent.get()?.setRenderEffect(null)
         blurredHostContent.clear()

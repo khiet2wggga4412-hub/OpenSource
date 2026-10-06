@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -19,7 +14,6 @@ public final class LiquidBounceFonts {
     private static Typeface bold;
     private static String family = "Inter";
 
-    /** HUD Binds 面板专用：保留原 Roboto 字体。 */
     private static Typeface bindsRegular;
     private static Typeface bindsMedium;
     private static Typeface bindsBold;

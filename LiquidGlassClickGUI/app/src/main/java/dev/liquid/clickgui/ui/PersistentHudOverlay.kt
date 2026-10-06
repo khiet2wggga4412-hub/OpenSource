@@ -62,7 +62,6 @@ import kotlin.math.PI
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-/** Non-interactive HUD content that stays attached while the ClickGUI is collapsed. */
 @Composable
 fun PersistentHudOverlay(
     controller: ClickGuiController,

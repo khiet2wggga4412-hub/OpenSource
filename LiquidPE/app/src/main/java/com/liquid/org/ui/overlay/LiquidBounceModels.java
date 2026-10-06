@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -28,7 +23,7 @@ public final class LiquidBounceModels {
     public static final class CategoryPanel {
         public final String id;
         public final String name;
-        /** 当前画布中的逻辑绘制坐标，会作为自由布局的位置持久化。 */
+
         public float x;
         public float y;
         public PanelLayoutInfo layoutInfo;
@@ -54,7 +49,7 @@ public final class LiquidBounceModels {
         public String description = "";
         public final List<String> aliases = new ArrayList<>();
         public final List<SettingEntry> settings = new ArrayList<>();
-        /** Metadata displayed by the right-side ArrayList. */
+
         public String arrayListSuffix = "";
         public String keyBind = "None";
         public boolean showInArrayList = true;

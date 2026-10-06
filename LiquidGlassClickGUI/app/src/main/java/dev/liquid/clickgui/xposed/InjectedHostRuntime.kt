@@ -11,7 +11,6 @@ import de.robv.android.xposed.XposedBridge
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-/** 真实宿主 ClassLoader 和输入 Hook 就绪后，才启动游戏内 ClickGUI。 */
 internal object InjectedHostRuntime : HostHookCallbacks {
     private val hostReady = AtomicBoolean(false)
     private val loading = AtomicBoolean(false)

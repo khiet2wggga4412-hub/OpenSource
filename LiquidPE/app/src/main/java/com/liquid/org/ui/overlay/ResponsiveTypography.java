@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.overlay;
 
@@ -10,14 +5,6 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 
-/**
- * Keeps Canvas text legible without changing the reference-coordinate layout.
- *
- * The UI is drawn from a fixed reference frame, so a fixed Paint size makes text
- * feel too large on narrow phones and too small on tablets.  This class provides
- * one shared multiplier for every Canvas renderer and also respects Android's
- * accessibility font-size preference.
- */
 public final class ResponsiveTypography {
     private static final float MIN_SCALE = .82f;
     private static final float MAX_SCALE = 1.25f;
@@ -36,8 +23,6 @@ public final class ResponsiveTypography {
         float shortestWidthDp = Math.min(widthPx, heightPx) / density;
         if (shortestWidthDp <= 0f) shortestWidthDp = configuration.smallestScreenWidthDp;
 
-        // Keep labels inside compact controls on phones, while using the extra
-        // space available on tablets and desktop-sized displays.
         float deviceScale;
         if (shortestWidthDp <= 360f) {
             deviceScale = .90f;
@@ -60,7 +45,6 @@ public final class ResponsiveTypography {
         return scale;
     }
 
-    /** Control geometry follows the screen class, but not the user's text-only preference. */
     public float control(float referenceSize) {
         return referenceSize * controlScale;
     }

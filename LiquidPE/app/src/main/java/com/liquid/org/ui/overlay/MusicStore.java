@@ -17,7 +17,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Public NetEase Cloud Music search/play client. No credentials or private signing code is embedded. */
 public final class MusicStore {
     public static final class Track {
         public final long id;

@@ -12,10 +12,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.lang.reflect.Method
 import java.util.concurrent.atomic.AtomicBoolean
 
-/**
- * 先安装 framework Activity 生命周期 Hook。观察到真实 Minecraft MainActivity 后，
- * 再使用该 Activity 自身的 ClassLoader 安装输入 Hook，避免被 StubApp 的壳 ClassLoader 卡住。
- */
 object MinecraftHostHookFeature : HookFeature {
     private const val MAIN_ACTIVITY = "com.mojang.minecraftpe.MainActivity"
     private const val STUB_APPLICATION = "com.netease.android.protect.StubApp"
@@ -74,7 +70,7 @@ object MinecraftHostHookFeature : HookFeature {
                 },
             )
         }.onFailure { error ->
-            // 壳实现可能随版本变化；framework Activity 生命周期 Hook 仍可继续工作。
+
             XposedBridge.log("LiquidClickGUI StubApp hook unavailable: ${error.message}")
             XposedBridge.log(error)
         }

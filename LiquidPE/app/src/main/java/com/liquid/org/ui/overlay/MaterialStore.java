@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/** Local material-pack manager. It scans app-private .apk/.zip packs and can add them to AssetManager. */
 public final class MaterialStore {
     public static final class Material {
         public final String name;

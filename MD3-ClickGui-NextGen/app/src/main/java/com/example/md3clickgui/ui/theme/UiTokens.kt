@@ -3,7 +3,6 @@ package com.example.md3clickgui.ui.theme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 
-/** Shared layout rhythm for the click GUI. Values stay on a 4dp grid. */
 object NexusSpacing {
     val extraSmall = 4.dp
     val small = 8.dp

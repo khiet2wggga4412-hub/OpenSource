@@ -667,7 +667,7 @@ private fun LiquidModuleCard(
     LaunchedEffect(longPressSequence) {
         if (longPressSequence == 0) return@LaunchedEffect
         openingDetail = true
-        // 先让卡片完成一次明显下沉，再弹出详情页，避免长按动作被弹窗截断。
+
         delay(210)
         controller.selectedModule = currentModule
         delay(180)

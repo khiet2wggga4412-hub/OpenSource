@@ -15,7 +15,6 @@ import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
-/** A track returned by the NetEase search API. */
 data class Song(
     val id: Long,
     val title: String,
@@ -24,7 +23,6 @@ data class Song(
     val coverUrl: String = ""
 )
 
-/** A playlist shown in Featured / Recommend discovery rows. */
 data class PlaylistSummary(
     val id: Long,
     val name: String,
@@ -33,13 +31,8 @@ data class PlaylistSummary(
     val playCount: Long = 0L
 )
 
-/**
- * Minimal client for NetEase Cloud Music's eapi endpoints — the same encrypted HTTP APIs the
- * official mobile client uses. Requests are signed with the eapi cipher (AES-128-ECB + MD5)
- * and posted to `interfacepc.music.163.com/eapi/...`. No third-party server is required.
- */
 object NeteaseMusicApi {
-    /** Browser UA sent to the audio CDN by the player. */
+
     internal const val USER_AGENT =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
@@ -48,7 +41,6 @@ object NeteaseMusicApi {
     private const val EAPI_UA = "NeteaseMusic 9.0.90/5038 (iPhone; iOS 16.2; zh_CN)"
     private const val WEAPI_BASE = "https://music.163.com"
 
-    // weapi (web) cipher constants.
     private const val NONCE = "0CoJUm6Qyw8W8jud"
     private const val IV = "0102030405060708"
     private const val RSA_PUBLIC_KEY = "010001"
@@ -61,7 +53,6 @@ object NeteaseMusicApi {
     private val hexUpper = "0123456789ABCDEF"
     private val hexLower = "0123456789abcdef"
 
-    /** Searches songs by keyword; returns up to 50 free tracks (empty list on any failure). */
     suspend fun search(keyword: String): List<Song> = withContext(Dispatchers.IO) {
         val normalized = keyword.trim()
         if (normalized.isEmpty()) return@withContext emptyList()
@@ -76,17 +67,15 @@ object NeteaseMusicApi {
         val result = mutableListOf<Song>()
         for (i in 0 until songs.length()) {
             val item = songs.optJSONObject(i) ?: continue
-            // fee > 0 are paid/VIP tracks that return no playable URL.
+
             if (item.optInt("fee", 0) > 0) continue
             parseSong(item)?.let { result.add(it) }
         }
         result
     }
 
-    /** Resolves a direct playable HTTPS stream URL for a song id (null on failure). */
     suspend fun songUrl(id: Long): String? = withContext(Dispatchers.IO) {
-        // Use the public meting proxy (same technique as the LiquidPE client): it answers with a
-        // 302 redirect straight to an HTTPS CDN mp3, avoiding the eapi "null url" edge cases.
+
         val endpoint = "https://api.injahow.cn/meting/?server=netease&type=url&id=$id"
         var connection: HttpURLConnection? = null
         try {
@@ -109,22 +98,17 @@ object NeteaseMusicApi {
         }
     }
 
-    // ---- Personal / discovery data ---------------------------------------------------------
-    /** Tracks of a public playlist by id. */
     suspend fun playlistSongs(playlistId: Long): List<Song> = withContext(Dispatchers.IO) {
         val data = JSONObject().put("id", playlistId).put("n", 100000).put("s", 8)
         val json = weapiPost("/weapi/v3/playlist/detail", data) ?: return@withContext emptyList()
         parseSongArray(json.optJSONObject("playlist")?.optJSONArray("tracks"))
     }
 
-    /** High-quality / curated playlists (no login required). */
     suspend fun highqualityPlaylists(limit: Int = 30): List<PlaylistSummary> = withContext(Dispatchers.IO) {
         val data = JSONObject().put("cat", "全部").put("limit", limit).put("lasttime", 0).put("total", true)
         val json = weapiPost("/weapi/playlist/highquality/list", data) ?: return@withContext emptyList()
         mapPlaylists(json.optJSONArray("playlists"))
     }
-
-    // ---- shared helpers --------------------------------------------------------------------
 
     private fun parseSongArray(array: JSONArray?): List<Song> {
         if (array == null) return emptyList()
@@ -154,7 +138,6 @@ object NeteaseMusicApi {
         return result
     }
 
-    /** weapi POST: AES-CBC (double) params + RSA encSecKey, to `music.163.com`. */
     private fun weapiPost(uri: String, obj: JSONObject): JSONObject? {
         val (params, encSecKey) = weapi(obj)
         val cookie = buildCookieWithSession()
@@ -186,7 +169,6 @@ object NeteaseMusicApi {
         }
     }
 
-    /** Produces the `params` + `encSecKey` pair for a weapi request body. */
     private fun weapi(obj: JSONObject): Pair<String, String> {
         val text = obj.toString()
         val secretKey = randomSecretKey()
@@ -209,7 +191,6 @@ object NeteaseMusicApi {
         return Base64.getEncoder().encodeToString(cipher.doFinal(text.toByteArray(Charsets.UTF_8)))
     }
 
-    /** RSA (modular exponentiation) of the reversed secret key, hex-padded to 256 chars. */
     private fun rsaEncSecKey(secretKey: String): String {
         val text = BigInteger(1, secretKey.reversed().toByteArray(Charsets.UTF_8))
         val exponent = BigInteger(RSA_PUBLIC_KEY, 16)
@@ -292,7 +273,6 @@ object NeteaseMusicApi {
         }
     }
 
-    /** Encrypts [uri] + [obj] into the uppercase-hex `params` string NetEase expects. */
     private fun eapi(uri: String, obj: JSONObject): String {
         val text = obj.toString()
         val digest = md5Hex("nobody${uri}use${text}md5forencrypt")

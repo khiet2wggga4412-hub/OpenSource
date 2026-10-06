@@ -7,7 +7,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-/** 可由多个独立 ComposeView 共享的悬浮按钮尺寸状态。 */
 @Stable
 class FloatingButtonConfig(
     initialSizeDp: Int = DEFAULT_SIZE_DP,

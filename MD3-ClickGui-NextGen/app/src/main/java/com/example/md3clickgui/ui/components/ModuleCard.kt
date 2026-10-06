@@ -107,12 +107,12 @@ import com.example.md3clickgui.ui.model.ModuleKeybind
 import com.example.md3clickgui.ui.model.isGamepadKey
 import com.example.md3clickgui.ui.model.keyLabel
 import androidx.compose.runtime.LaunchedEffect
-/** A fixed-height module row with explicit selection and a separate enable control. */
+
 @Composable
 internal fun ModuleCard(module: GuiModule, state: ClickGuiState, languageIndex: Int = 0, categoryName: String = "", selection: SlidingSelection) {
     val colors = MaterialTheme.colorScheme
     val selected = state.isDetailsPanelOpen && state.selectedModuleId == module.id
-    // Direct response to a tap, so it uses the short feedback tier rather than the transition one.
+
     val foreground by animateColorAsState(if (selected) colors.onPrimaryContainer else colors.onSurface, NexusMotion.colorSpec(), label = "moduleTextColor")
     Surface(
         onClick = { state.selectModule(module.id) },
@@ -146,17 +146,11 @@ internal fun ModuleCard(module: GuiModule, state: ClickGuiState, languageIndex: 
     }
 }
 
-/**
- * Cards whose switch would be meaningless. Theme / Language / ShortcutButton are app-level settings
- * the card itself edits, and [ModuleBinding.Content] cards (music) only open a panel — none of them
- * has an off state, so the list must not offer a switch for them.
- */
 private fun GuiModule.hasEnableSwitch(): Boolean = when (binding) {
     ModuleBinding.Standard, ModuleBinding.DarkMode, ModuleBinding.DynamicColor -> true
     ModuleBinding.Theme, ModuleBinding.Language, ModuleBinding.ShortcutButton, ModuleBinding.Content -> false
 }
 
-/** Each setting uses the same label column and control column. */
 @Composable
 fun ModuleSettingsPanel(
     module: GuiModule,
@@ -193,8 +187,7 @@ fun ModuleSettingsPanel(
                     verticalArrangement = Arrangement.spacedBy(NexusDimensions.rowGap)
                 ) {
                     module.settings.forEach { setting -> ModuleSettingControl(module, setting, state, languageIndex) }
-                    // The two ways to reach a module sit at the end of the list, each in its own card
-                    // like every other setting. The switch toggle only applies where a switch exists.
+
                     if (module.hasEnableSwitch()) {
                         ModuleSettingControl(module, ModuleSetting.Shortcut, state, languageIndex)
                     }
@@ -205,16 +198,6 @@ fun ModuleSettingsPanel(
     }
 }
 
-/**
- * Binds a physical button to a module, in its own settings card.
- *
- * A module has two independent ways to be reached from outside the panel: the Shortcut card above
- * creates a floating button, this card binds a key. A module may have either, both, or neither.
- *
- * While listening, the prompt takes focus and swallows the next key press. `onPreviewKeyEvent` is
- * used rather than `onKeyEvent` so the press is consumed before it can also activate a focused
- * button.
- */
 @Composable
 private fun KeybindCard(module: GuiModule, state: ClickGuiState, languageIndex: Int) {
     val colors = MaterialTheme.colorScheme
@@ -226,7 +209,7 @@ private fun KeybindCard(module: GuiModule, state: ClickGuiState, languageIndex: 
     }
     SettingRow(uiText(languageIndex, "Keybind")) {
         if (listening) {
-            // Clicking the prompt cancels, so there is a way out without owning a keyboard.
+
             Surface(
                 onClick = { listening = false },
                 shape = NexusIconShape,
@@ -238,9 +221,9 @@ private fun KeybindCard(module: GuiModule, state: ClickGuiState, languageIndex: 
                     .focusable()
                     .onPreviewKeyEvent { event ->
                         if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                        // Key.keyCode is the Android key code held as a Long; ModuleKeybind stores an Int.
+
                         val code = event.key.keyCode.toInt()
-                        // Escape and Back abandon the capture instead of binding themselves.
+
                         if (code == AndroidKeyCodes.KEYCODE_ESCAPE || code == AndroidKeyCodes.KEYCODE_BACK) {
                             listening = false
                         } else {
@@ -561,7 +544,6 @@ private fun hsvToHex(hue: Float, saturation: Float, value: Float): String {
     return String.format(Locale.US, "#%06X", color and 0x00FFFFFF)
 }
 
-/** Handles both a tap-to-place and a continuous drag without competing detectors. */
 private suspend fun PointerInputScope.awaitColorGesture(onPosition: (Offset) -> Unit) {
     awaitEachGesture {
         val down = awaitFirstDown(requireUnconsumed = false)

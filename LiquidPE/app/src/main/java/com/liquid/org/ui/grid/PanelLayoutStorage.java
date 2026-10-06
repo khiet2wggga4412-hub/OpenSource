@@ -1,8 +1,3 @@
-/*
- * LiquidPE 开源作者
- * QQ：1513583976
- * 邮箱：atlasca3@gmail.com
- */
 
 package com.liquid.org.ui.grid;
 
@@ -18,10 +13,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/** SharedPreferences + JSON 的轻量布局存储。读取失败时返回空布局，不会让页面崩溃。 */
 public final class PanelLayoutStorage {
-    /* v5 invalidates the old top-left defaults; user-created free positions remain
-       isolated from the previous coordinate system. */
+
     private static final String PREFS_NAME = "draggable_panel_layouts_v5";
     private static final String KEY_LAYOUT = "layout";
     private static final int VERSION = 3;
@@ -50,7 +43,7 @@ public final class PanelLayoutStorage {
                 }
                 panels.put(item);
             } catch (JSONException ignored) {
-                // Android 的 JSONObject 对上述基础类型不会失败；保留兜底以避免持久化影响主流程。
+
             }
         }
         JSONObject root = new JSONObject();
@@ -59,11 +52,10 @@ public final class PanelLayoutStorage {
             root.put("panels", panels);
             preferences.edit().putString(KEY_LAYOUT, root.toString()).apply();
         } catch (JSONException ignored) {
-            // 保持上一次有效布局。
+
         }
     }
 
-    /** 返回以 panelId 去重后的记录；后出现的重复记录会被丢弃。 */
     public Map<String, PanelLayoutInfo> load() {
         Map<String, PanelLayoutInfo> result = new LinkedHashMap<>();
         String raw = preferences.getString(KEY_LAYOUT, null);
@@ -87,7 +79,7 @@ public final class PanelLayoutStorage {
                 result.put(id, info);
             }
         } catch (JSONException ignored) {
-            // 损坏 JSON 视为没有保存过；调用者会按默认规则重新排布。
+
         }
         return result;
     }

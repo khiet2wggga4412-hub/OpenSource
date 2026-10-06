@@ -49,7 +49,6 @@ import com.example.md3clickgui.ui.state.ClickGuiState
 import com.example.md3clickgui.ui.theme.NexusMotion
 import com.example.md3clickgui.ui.theme.NexusSpacing
 
-/** Positions offered by [ArrayListModule]; the index is the Choice value stored by the settings row. */
 private enum class ArraylistCorner(val top: Boolean, val start: Boolean) {
     TopEnd(top = true, start = false),
     TopStart(top = true, start = true),
@@ -61,13 +60,8 @@ private enum class ArraylistCorner(val top: Boolean, val start: Boolean) {
     }
 }
 
-/**
- * Safety bound only: every enabled module gets a row, and the catalog cannot reach this. It exists
- * so a future module explosion cannot render an unbounded list.
- */
 private const val MaxRows = 32
 
-/** The arraylist lists features that toggle; these bindings describe settings or panel content. */
 private val NonListingBindings = setOf(
     ModuleBinding.Theme,
     ModuleBinding.Language,
@@ -75,18 +69,6 @@ private val NonListingBindings = setOf(
     ModuleBinding.Content
 )
 
-/**
- * Arraylist HUD: every enabled module as a compact Material 3 row, longest label first.
- *
- * The layer must never swallow input meant for the workspace, which constrains how it is built:
- *
- * - the anchor box fills the screen only to position its child; it carries no gesture handling, so
- *   taps outside the child pass straight through;
- * - the list itself is wrapped in a shrink-to-fit box, so the region that does take touch is only
- *   as large as the rows. A `LazyColumn` consumes pointer events by itself in order to scroll, so
- *   giving it the full screen would make the whole workspace untappable — the panel would look
- *   unresponsive wherever the list was laid out.
- */
 @Composable
 fun ArrayListHudLayer(
     state: ClickGuiState,
@@ -94,8 +76,7 @@ fun ArrayListHudLayer(
     modifier: Modifier = Modifier
 ) {
     val module = ArrayListModule.model
-    // Deliberately independent of the window: the arraylist is a HUD, so it keeps showing the
-    // enabled modules while the ClickGUI is collapsed. The module's own switch is the only control.
+
     if (!state.isChecked(module)) return
 
     val colors = MaterialTheme.colorScheme
@@ -121,34 +102,23 @@ fun ArrayListHudLayer(
         else -> padded to Alignment.BottomEnd
     }
     Box(modifier = modifier.then(anchor), contentAlignment = contentAlignment) {
-        // Shrink-to-fit, so the layer's own footprint is exactly the rows and nothing else. The list
-        // is never given a height budget: one row per enabled module, however many that is. Being
-        // content-sized also keeps it non-interactive — it never consumes a gesture, so a tap in
-        // that corner still reaches the workspace underneath.
+
         Box(modifier = Modifier.wrapContentSize(align = contentAlignment)) {
-            // A lazy list, not a plain Column: only a lazy layout can animate an item from its old
-            // position to its new one when the order changes. The rows are additionally keyed by
-            // module id, so a row is the same item across re-sorts instead of a slot that changes
-            // identity.
-            // One spatial token for all three: the row sliding in, sliding out, and moving to a new
-            // position when the list re-sorts.
+
             val slideSpec = NexusMotion.enterSpec<IntOffset>()
             val fromEdge = if (corner.start) -1f else 1f
             LazyColumn(
-                // Content-sized, so there is nothing to scroll; leaving scrolling on would let the
-                // list swallow drags meant for the workspace under it.
+
                 userScrollEnabled = false,
                 horizontalAlignment = if (corner.start) Alignment.Start else Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(NexusSpacing.extraSmall, Alignment.Top)
             ) {
             items(items = entries, key = { it.module.id }) { row ->
-                // Seeded false so a row that appears later still animates in.
+
                 val visible = remember { MutableTransitionState(false).apply { targetState = true } }
                 AnimatedVisibility(
                     visibleState = visible,
-                    // Rows come in from the side the list is anchored to: a right-hand list travels
-                    // in from the right edge, a left-hand one from the left, at the full row width so
-                    // the motion reads as a slide. Exit mirrors the entry.
+
                     enter = fadeIn(NexusMotion.enterSpec<Float>()) +
                         slideInHorizontally(slideSpec) { width -> (width * fromEdge).toInt() },
                     exit = fadeOut(NexusMotion.exitSpec<Float>()) +
@@ -173,10 +143,6 @@ fun ArrayListHudLayer(
 
 private data class ArraylistRow(val sectionId: String, val module: GuiModule, val label: String)
 
-/**
- * Enabled, listable modules in catalog order, then reordered by label length (longest first) so the
- * stack reads as the usual arraylist wedge. Ties keep catalog order, which keeps the layout stable.
- */
 private fun orderedEntries(state: ClickGuiState, sections: List<GuiSection>): List<ArraylistRow> {
     val result = ArrayList<ArraylistRow>(MaxRows)
     for (section in sections) {
@@ -191,7 +157,6 @@ private fun orderedEntries(state: ClickGuiState, sections: List<GuiSection>): Li
     return result.sortedByDescending { it.label.length }.take(MaxRows)
 }
 
-/** One entry: optional module icon, then the module name. */
 @Composable
 private fun ArrayListRow(
     label: String,
@@ -208,11 +173,9 @@ private fun ArrayListRow(
     } else {
         Color.Transparent
     }
-    // The icon follows the text size so the row keeps its proportions at every size.
+
     val iconSize = with(LocalDensity.current) { (textSize.value + 3f).sp.toDp() }
-    // Padding scales with the label too. A fixed inset would dominate the row once the text is
-    // small — at 1sp the label is one pixel tall, so a constant 6dp would leave a mostly empty row.
-    // The floor keeps a minimum of breathing room at the smallest sizes.
+
     val verticalPadding = (textSize.value * 0.45f).dp.coerceAtLeast(1.dp)
     val horizontalPadding = (textSize.value * 0.6f).dp.coerceAtLeast(1.dp)
     Surface(
@@ -241,12 +204,6 @@ private fun ArrayListRow(
     }
 }
 
-/**
- * Category accent from the fixed section order, so a module keeps one colour across recompositions.
- *
- * Solid roles only — the `*Container` variants are pale surfaces, and as an icon tint on the row
- * they read as washed out. These are the saturated roles, which stay legible on the row surface.
- */
 private fun sectionAccent(sectionId: String, colors: androidx.compose.material3.ColorScheme): Color {
     val palette = listOf(
         colors.primary,

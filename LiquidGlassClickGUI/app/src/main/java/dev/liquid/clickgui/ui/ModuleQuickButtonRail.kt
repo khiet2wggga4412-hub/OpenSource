@@ -46,12 +46,6 @@ import dev.liquid.clickgui.model.ModuleUiModel
 private val QuickButtonBlue = Color(0xFF078BFF)
 private val QuickButtonInk = Color(0xFF075EA8)
 
-/**
- * 单个功能对应的独立快捷悬浮按钮。
- *
- * 宿主可为每个已固定模块分别创建 ComposeView，并通过 [onDrag] 独立保存位置。
- * 短按切换功能；长按成立后才接管拖动，避免影响普通点击。
- */
 @Composable
 fun ModuleQuickFloatingButton(
     module: ModuleUiModel,
