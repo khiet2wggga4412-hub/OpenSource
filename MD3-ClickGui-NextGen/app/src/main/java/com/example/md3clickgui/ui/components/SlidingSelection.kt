@@ -134,7 +134,7 @@ internal fun rememberSlidingSelection(selectedId: String?, highlightColor: Color
     // Keyed on the selection alone: recomposing (scroll, resize, colour change) must not restart
     // the slide. Every write to the selection's state happens here, never during composition.
     // The spec is read during composition and captured, so the effect body itself needs no theme.
-    val slideSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>()
+    val slideSpec = NexusMotion.feedbackSpec<Float>()
     LaunchedEffect(selectedId) {
         val current = selection.currentRect()
         val targetMeasured = selectedId != null && selection.bounds.containsKey(selectedId)

@@ -80,6 +80,7 @@ import com.example.md3clickgui.music.Song
 import com.example.md3clickgui.ui.language.uiText
 import com.example.md3clickgui.ui.theme.NexusCornerShape
 import com.example.md3clickgui.ui.theme.NexusIconShape
+import com.example.md3clickgui.ui.theme.NexusMotion
 import com.example.md3clickgui.ui.theme.NexusSpacing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -345,9 +346,9 @@ private fun NowPlayingCard(
     Surface(shape = NexusCornerShape, color = colors.surfaceContainer) {
         Column(Modifier.fillMaxWidth().padding(NexusSpacing.medium)) {
             // Hoisted out of transitionSpec, which is not a composable scope.
-            val trackFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
-            val trackExitFadeSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
-            val trackSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+            val trackFadeSpec = NexusMotion.enterSpec<Float>()
+            val trackExitFadeSpec = NexusMotion.exitSpec<Float>()
+            val trackSlideSpec = NexusMotion.enterSpec<IntOffset>()
             AnimatedContent(
                 targetState = song,
                 modifier = Modifier.fillMaxWidth(),

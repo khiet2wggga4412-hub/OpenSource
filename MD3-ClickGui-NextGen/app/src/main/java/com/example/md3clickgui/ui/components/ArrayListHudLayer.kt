@@ -71,7 +71,7 @@ private const val MaxRows = 32
 private val NonListingBindings = setOf(
     ModuleBinding.Theme,
     ModuleBinding.Language,
-    ModuleBinding.FloatingButton,
+    ModuleBinding.ShortcutButton,
     ModuleBinding.Content
 )
 
@@ -132,7 +132,7 @@ fun ArrayListHudLayer(
             // identity.
             // One spatial token for all three: the row sliding in, sliding out, and moving to a new
             // position when the list re-sorts.
-            val slideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+            val slideSpec = NexusMotion.enterSpec<IntOffset>()
             val fromEdge = if (corner.start) -1f else 1f
             LazyColumn(
                 // Content-sized, so there is nothing to scroll; leaving scrolling on would let the
@@ -149,9 +149,9 @@ fun ArrayListHudLayer(
                     // Rows come in from the side the list is anchored to: a right-hand list travels
                     // in from the right edge, a left-hand one from the left, at the full row width so
                     // the motion reads as a slide. Exit mirrors the entry.
-                    enter = fadeIn(MaterialTheme.motionScheme.defaultEffectsSpec<Float>()) +
+                    enter = fadeIn(NexusMotion.enterSpec<Float>()) +
                         slideInHorizontally(slideSpec) { width -> (width * fromEdge).toInt() },
-                    exit = fadeOut(MaterialTheme.motionScheme.defaultSpatialSpec<Float>()) +
+                    exit = fadeOut(NexusMotion.exitSpec<Float>()) +
                         slideOutHorizontally(slideSpec) { width -> (width * fromEdge).toInt() },
                     modifier = Modifier.animateItem(placementSpec = slideSpec)
                 ) {

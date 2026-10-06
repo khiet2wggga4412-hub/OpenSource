@@ -48,7 +48,6 @@ import com.example.md3clickgui.ui.theme.NexusDimensions
 import com.example.md3clickgui.ui.theme.NexusIconShape
 import com.example.md3clickgui.ui.theme.NexusSpacing
 import com.example.md3clickgui.ui.theme.NexusMotion
-import com.example.md3clickgui.ui.theme.colorSpring
 
 /** Navigation occupies its own column, including its expand/collapse button. */
 @Composable
@@ -69,7 +68,7 @@ fun CategoryRail(
     val pinnedIds = setOf(SectionIds.MUSIC, SectionIds.CONFIG)
     val labelAlpha by animateFloatAsState(
         targetValue = if (expanded) 1f else 0f,
-        animationSpec = MaterialTheme.motionScheme.fastSpatialSpec<Float>(),
+        animationSpec = NexusMotion.feedbackSpec<Float>(),
         label = "categoryLabelFade"
     )
     Surface(modifier = modifier.fillMaxHeight(), color = colors.surfaceContainerLow, shape = NexusCornerShape) {
@@ -127,7 +126,7 @@ private fun CategoryItem(section: GuiSection, isSelected: Boolean, expanded: Boo
     val colors = MaterialTheme.colorScheme
     val contentColor by animateColorAsState(
         if (isSelected) colors.onSecondaryContainer else colors.onSurfaceVariant,
-        colorSpring(), label = "categoryContentColor"
+        NexusMotion.colorSpec(), label = "categoryContentColor"
     )
     // The anchored rows carry no selected background: the indicator deliberately stays on the last
     // scrolling card, and a second highlight here would read as the indicator having moved.

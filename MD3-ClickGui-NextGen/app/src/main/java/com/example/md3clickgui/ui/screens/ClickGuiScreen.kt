@@ -38,10 +38,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.size
+import com.example.md3clickgui.ui.components.dispatchKeybinds
 import com.example.md3clickgui.ui.components.ArrayListHudLayer
 import com.example.md3clickgui.ui.components.ClickGuiWindow
-import com.example.md3clickgui.ui.components.OpenPanelFloatingButton
-import com.example.md3clickgui.ui.components.QuickFloatingButtonLayer
+import com.example.md3clickgui.ui.components.OpenPanelButton
+import com.example.md3clickgui.ui.components.ShortcutLayer
 import com.example.md3clickgui.ui.model.GuiSection
 import com.example.md3clickgui.ui.modules.guiSections
 import com.example.md3clickgui.ui.state.ClickGuiState
@@ -59,15 +60,16 @@ fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSection
     val colors = MaterialTheme.colorScheme
     // Panel visibility fades and scales, so it takes the effects token. The window slide takes the
     // spatial token; both come straight from the scheme installed in NexusTheme.
-    val panelVisibilitySpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
-    val panelExitSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
-    val windowSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+    val panelVisibilitySpec = NexusMotion.enterSpec<Float>()
+    val panelExitSpec = NexusMotion.exitSpec<Float>()
+    val windowSlideSpec = NexusMotion.enterSpec<Float>()
     val windowStateHolder = rememberSaveableStateHolder()
     val modules = remember(sections) { sections.flatMap { it.modules } }
     var panelWidthRatio by rememberSaveable { mutableFloatStateOf(DefaultPanelWidthRatio) }
     var panelHeightRatio by rememberSaveable { mutableFloatStateOf(DefaultPanelHeightRatio) }
     Box(
-        modifier = Modifier.fillMaxSize().background(colors.background),
+        modifier = Modifier.fillMaxSize().background(colors.background)
+            .dispatchKeybinds(state, modules),
         contentAlignment = Alignment.Center
     ) {
         BoxWithConstraints(
@@ -75,10 +77,10 @@ fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSection
             contentAlignment = Alignment.Center
         ) {
             val touchTargetPx = with(LocalDensity.current) {
-                NexusDimensions.quickFloatingButtonTouchTarget.toPx()
+                NexusDimensions.quickShortcutTouchTarget.toPx()
             }
-            val floatingTravelWidth = (maxWidth.value * LocalDensity.current.density - touchTargetPx).coerceAtLeast(0f)
-            val floatingTravelHeight = (maxHeight.value * LocalDensity.current.density - touchTargetPx).coerceAtLeast(0f)
+            val shortcutTravelWidth = (maxWidth.value * LocalDensity.current.density - touchTargetPx).coerceAtLeast(0f)
+            val shortcutTravelHeight = (maxHeight.value * LocalDensity.current.density - touchTargetPx).coerceAtLeast(0f)
 
             val density = LocalDensity.current
             val viewportWidth = maxWidth
@@ -97,9 +99,9 @@ fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSection
                 visible = state.isWindowOpen,
                 modifier = Modifier.fillMaxSize(),
                 enter = fadeIn(animationSpec = panelVisibilitySpec) + scaleIn(initialScale = 0.97f, animationSpec = panelVisibilitySpec) +
-                    slideInVertically(MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()) { windowTravelPx },
+                    slideInVertically(NexusMotion.enterSpec<IntOffset>()) { windowTravelPx },
                 exit = fadeOut(animationSpec = panelExitSpec) + scaleOut(targetScale = 0.97f, animationSpec = panelVisibilitySpec) +
-                    slideOutVertically(MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()) { windowTravelPx },
+                    slideOutVertically(NexusMotion.exitSpec<IntOffset>()) { windowTravelPx },
                 label = "clickGuiWindowVisibility"
             ) {
                 Box(
@@ -171,15 +173,15 @@ fun ClickGuiScreen(state: ClickGuiState, sections: List<GuiSection> = guiSection
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    OpenPanelFloatingButton(
+                    OpenPanelButton(
                         state = state,
-                        travelWidth = floatingTravelWidth,
-                        travelHeight = floatingTravelHeight
+                        travelWidth = shortcutTravelWidth,
+                        travelHeight = shortcutTravelHeight
                     )
                 }
             }
         }
-        QuickFloatingButtonLayer(
+        ShortcutLayer(
             modules = modules,
             state = state,
             modifier = Modifier.fillMaxSize()

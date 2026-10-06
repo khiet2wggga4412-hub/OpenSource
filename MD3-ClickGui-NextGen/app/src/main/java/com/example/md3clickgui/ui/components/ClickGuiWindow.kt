@@ -82,7 +82,6 @@ import com.example.md3clickgui.ui.theme.NexusSpacing
 import com.example.md3clickgui.ui.theme.NexusMotion
 import com.example.md3clickgui.ui.language.uiText
 import androidx.compose.ui.unit.IntOffset
-import com.example.md3clickgui.ui.theme.dpSpring
 
 private val NexusInputBorderThickness = 2.dp
 
@@ -137,7 +136,7 @@ fun ClickGuiWindow(
         val showCategoryLabels = categoriesExpanded && maxWidth >= 720.dp
         val railWidth by animateDpAsState(
             if (showCategoryLabels) NexusDimensions.categoryRailExpanded else NexusDimensions.categoryRailCollapsed,
-            animationSpec = dpSpring(), label = "categoryWidth"
+            animationSpec = NexusMotion.enterSpec<Dp>(), label = "categoryWidth"
         )
         val remainingWidth = (maxWidth - railWidth - NexusDimensions.workspaceGap * 2).coerceAtLeast(0.dp)
         val stableListWidth = ((maxWidth - NexusDimensions.categoryRailExpanded - NexusDimensions.workspaceGap * 2) * 0.36f).coerceIn(176.dp, 280.dp)
@@ -158,9 +157,9 @@ fun ClickGuiWindow(
             )
             // Read outside the AnimatedContent lambdas: transitionSpec is not a composable scope, so
             // the scheme cannot be consulted from inside it.
-            val enterFadeSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Float>()
-            val enterExitFadeSpec = MaterialTheme.motionScheme.fastEffectsSpec<Float>()
-            val enterSlideSpec = MaterialTheme.motionScheme.defaultSpatialSpec<IntOffset>()
+            val enterFadeSpec = NexusMotion.enterSpec<Float>()
+            val enterExitFadeSpec = NexusMotion.exitSpec<Float>()
+            val enterSlideSpec = NexusMotion.enterSpec<IntOffset>()
             AnimatedContent(
                 targetState = isConfigSection,
                 transitionSpec = {

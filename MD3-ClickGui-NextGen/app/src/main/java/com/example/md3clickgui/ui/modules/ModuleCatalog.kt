@@ -17,7 +17,7 @@ import com.example.md3clickgui.ui.modules.combat.AutoClickerModule
 import com.example.md3clickgui.ui.modules.combat.CriticalsModule
 import com.example.md3clickgui.ui.modules.combat.KillAuraModule
 import com.example.md3clickgui.ui.modules.combat.VelocityModule
-import com.example.md3clickgui.ui.modules.misc.FloatingButtonModule
+import com.example.md3clickgui.ui.modules.misc.ShortcutModule
 import com.example.md3clickgui.ui.modules.misc.LanguageModule
 import com.example.md3clickgui.ui.modules.misc.ThemeModule
 import com.example.md3clickgui.ui.modules.movement.FlyModule
@@ -111,7 +111,7 @@ val allModuleDefinitions: List<ModuleDefinition> = listOf(
     // Misc
     ThemeModule,
     LanguageModule,
-    FloatingButtonModule,
+    ShortcutModule,
     // Music
     MusicModule,
     FeaturedModule,

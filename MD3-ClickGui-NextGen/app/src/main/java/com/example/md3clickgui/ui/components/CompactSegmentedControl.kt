@@ -40,7 +40,7 @@ internal fun CompactSegmentedControl(
     if (options.isEmpty()) return
     val colors = MaterialTheme.colorScheme
     val position by animateFloatAsState(selectedIndex.coerceIn(options.indices).toFloat(),
-        MaterialTheme.motionScheme.fastSpatialSpec<Float>(), label = "segmentSlide")
+        NexusMotion.feedbackSpec<Float>(), label = "segmentSlide")
     Surface(modifier.height(NexusDimensions.controlHeight), shape = NexusIconShape,
         color = colors.surfaceContainerHigh) {
         Row(Modifier.padding(3.dp).selectableGroup().semantics { contentDescription = label }

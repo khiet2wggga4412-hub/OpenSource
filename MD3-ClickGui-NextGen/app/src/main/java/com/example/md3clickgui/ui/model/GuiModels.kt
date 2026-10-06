@@ -36,7 +36,7 @@ enum class ModuleBinding {
     DynamicColor,
     Theme,
     Language,
-    FloatingButton,
+    ShortcutButton,
 
     /**
      * Content a card opens rather than a feature that is on or off (the music player and its browse
@@ -46,8 +46,8 @@ enum class ModuleBinding {
     Content
 }
 
-/** Visual variants for per-module floating shortcuts; ordinal matches the Misc module's Style choice order. */
-enum class FloatingButtonStyle { Icon, Text, IconText }
+/** Visual variants for the per-module quick shortcuts; ordinal matches the Misc module's Style choice order. */
+enum class ShortcutStyle { Icon, Text, IconText }
 
 @Immutable
 data class GuiSection(

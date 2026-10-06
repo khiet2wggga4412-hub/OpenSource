@@ -27,8 +27,8 @@ object NexusDimensions {
     val emptyStateIcon = 64.dp
     val loadingIndicator = 72.dp
     val floatingActionButton = 36.dp
-    val quickFloatingButton = 32.dp
-    val quickFloatingButtonTouchTarget = 48.dp
+    val quickShortcut = 32.dp
+    val quickShortcutTouchTarget = 48.dp
     val categoryRailCollapsed = 56.dp
     val categoryRailExpanded = 164.dp
     val categoryItem = 40.dp

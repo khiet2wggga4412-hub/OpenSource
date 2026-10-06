@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import com.example.md3clickgui.ui.theme.NexusMotion
 import kotlin.math.pow
 
 /** Default theme colors shown above the custom color drawer. */
@@ -291,9 +292,9 @@ fun NexusTheme(
     }
     MaterialExpressiveTheme(
         colorScheme = colors,
-        // Standard motion, not expressive: the expressive scheme drives M3 components with
-        // spring-physics specs, so indicators and sliders carried their own bounce regardless of
-        // NexusMotion. Everything now shares the one non-overshooting ease.
+        // Inert for this app: every hand-authored animation passes its own NexusMotion spec, so the
+        // scheme only reaches Material 3's internal component motion (slider and menu internals).
+        // Kept explicit rather than relying on the parameter's default.
         motionScheme = MotionScheme.standard(),
     ) {
         CompositionLocalProvider(LocalRippleConfiguration provides null, content = content)

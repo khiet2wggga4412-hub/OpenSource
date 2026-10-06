@@ -10,13 +10,15 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import com.example.md3clickgui.ui.model.FloatingButtonStyle
+import com.example.md3clickgui.ui.model.ShortcutStyle
 import com.example.md3clickgui.ui.model.GuiModule
 import com.example.md3clickgui.ui.model.ModuleBinding
 import com.example.md3clickgui.ui.model.ModuleSetting
 import com.example.md3clickgui.ui.theme.NexusThemeSwatchHexes
 import java.util.Base64
 import kotlin.math.roundToInt
+import com.example.md3clickgui.ui.model.ModuleKeybind
+import com.example.md3clickgui.ui.model.keyLabel
 
 data class GuiConfig(
     val id: String,
@@ -34,9 +36,10 @@ data class ConfigSnapshot(
     val toggleValues: Map<String, Boolean> = emptyMap(),
     val sliderValues: Map<String, Float> = emptyMap(),
     val choiceValues: Map<String, Int> = emptyMap(),
-    val quickFloatingButtonValues: Map<String, Boolean> = emptyMap(),
-    val quickFloatingButtonPositions: Map<String, QuickFloatingButtonPosition> = emptyMap(),
-    val openPanelButtonPosition: QuickFloatingButtonPosition = QuickFloatingButtonPosition(0.5f, 0.5f)
+    val quickShortcutValues: Map<String, Boolean> = emptyMap(),
+    val quickShortcutPositions: Map<String, ShortcutPosition> = emptyMap(),
+    val openPanelButtonPosition: ShortcutPosition = ShortcutPosition(0.5f, 0.5f),
+    val keybinds: Map<String, ModuleKeybind> = emptyMap()
 )
 
 /**
@@ -80,11 +83,12 @@ class ClickGuiState(
     private val toggleValues = mutableStateMapOf<String, Boolean>()
     private val sliderValues = mutableStateMapOf<String, Float>()
     private val choiceValues = mutableStateMapOf<String, Int>()
-    private val quickFloatingButtonValues = mutableStateMapOf<String, Boolean>()
-    private val quickFloatingButtonPositions = mutableStateMapOf<String, QuickFloatingButtonPosition>()
+    private val quickShortcutValues = mutableStateMapOf<String, Boolean>()
+    private val quickShortcutPositions = mutableStateMapOf<String, ShortcutPosition>()
+    private val keybinds = mutableStateMapOf<String, ModuleKeybind>()
     private val configs = mutableStateListOf<GuiConfig>()
     private var nextConfigId by mutableIntStateOf(0)
-    private var openPanelButtonPosition by mutableStateOf(QuickFloatingButtonPosition(0.5f, 0.5f))
+    private var openPanelButtonPosition by mutableStateOf(ShortcutPosition(0.5f, 0.5f))
 
     val configurations: List<GuiConfig>
         get() = configs
@@ -135,7 +139,7 @@ class ClickGuiState(
         ModuleBinding.DynamicColor -> dynamicColor
         ModuleBinding.Theme -> true
         ModuleBinding.Language -> true
-        ModuleBinding.FloatingButton -> true
+        ModuleBinding.ShortcutButton -> true
         ModuleBinding.Content -> true
     }
 
@@ -146,7 +150,7 @@ class ClickGuiState(
             ModuleBinding.DynamicColor -> applyDynamicColor(!dynamicColor)
             ModuleBinding.Theme -> applyThemeIndex((themeIndex + 1) % ThemeSwatchCount)
             ModuleBinding.Language -> Unit
-            ModuleBinding.FloatingButton -> Unit
+            ModuleBinding.ShortcutButton -> Unit
             ModuleBinding.Content -> Unit
         }
     }
@@ -166,45 +170,79 @@ class ClickGuiState(
     }
 
     /** A shortcut is only meaningful for a module that can actually be on or off. */
-    fun isQuickFloatingButtonEnabled(module: GuiModule): Boolean =
+    fun isQuickShortcutEnabled(module: GuiModule): Boolean =
         module.binding != ModuleBinding.Theme &&
             module.binding != ModuleBinding.Language &&
-            module.binding != ModuleBinding.FloatingButton &&
+            module.binding != ModuleBinding.ShortcutButton &&
             module.binding != ModuleBinding.Content &&
-            quickFloatingButtonValues[module.id] == true
+            quickShortcutValues[module.id] == true
 
-    fun setQuickFloatingButtonEnabled(module: GuiModule, enabled: Boolean) {
-        quickFloatingButtonValues[module.id] = enabled
+    fun setQuickShortcutEnabled(module: GuiModule, enabled: Boolean) {
+        quickShortcutValues[module.id] = enabled
     }
 
-    /** Global shortcut style; index matches FloatingButtonModule's "Style" choice order. */
-    fun floatingButtonStyle(): FloatingButtonStyle = when (
-        choiceValues[settingKey(FloatingButtonModuleId, FloatingButtonStyleLabel)] ?: 0
+    /**
+     * Peripheral button bound to a module, or null.
+     *
+     * Every module may carry one, including the ones without an enable switch: pressing the button
+     * runs [triggerKeybind], which toggles a switchable module and opens the panel for a content
+     * module.
+     */
+    fun keybind(module: GuiModule): ModuleKeybind? = keybinds[module.id]
+
+    fun bindKey(module: GuiModule, keybind: ModuleKeybind) {
+        // One button drives one module: take it away from whoever held it before.
+        keybinds.entries.removeAll { it.value.keyCode == keybind.keyCode && it.key != module.id }
+        keybinds[module.id] = keybind
+    }
+
+    fun clearKeybind(module: GuiModule) {
+        keybinds.remove(module.id)
+    }
+
+    /**
+     * Runs the action bound to a module.
+     *
+     * Content modules (the music player and its browse panels) have no off state, so the button opens
+     * them instead of toggling.
+     */
+    fun triggerKeybind(module: GuiModule) {
+        if (module.binding == ModuleBinding.Content) {
+            selectModule(module.id)
+            openDetailsPanel()
+        } else {
+            toggle(module)
+        }
+    }
+
+    /** Global shortcut style; index matches ShortcutModule's "Style" choice order. */
+    fun shortcutStyle(): ShortcutStyle = when (
+        choiceValues[settingKey(ShortcutModuleId, ShortcutStyleLabel)] ?: 0
     ) {
-        1 -> FloatingButtonStyle.Text
-        2 -> FloatingButtonStyle.IconText
-        else -> FloatingButtonStyle.Icon
+        1 -> ShortcutStyle.Text
+        2 -> ShortcutStyle.IconText
+        else -> ShortcutStyle.Icon
     }
 
-    fun floatingButtonSize(): Float =
-        sliderValues[settingKey(FloatingButtonModuleId, FloatingButtonSizeLabel)] ?: DefaultFloatingButtonSize
+    fun shortcutSize(): Float =
+        sliderValues[settingKey(ShortcutModuleId, ShortcutSizeLabel)] ?: DefaultShortcutSize
 
-    fun floatingButtonCornerRadius(): Float =
-        sliderValues[settingKey(FloatingButtonModuleId, FloatingButtonCornerRadiusLabel)] ?: DefaultFloatingButtonCornerRadius
+    fun shortcutCornerRadius(): Float =
+        sliderValues[settingKey(ShortcutModuleId, ShortcutCornerRadiusLabel)] ?: DefaultShortcutCornerRadius
 
-    fun quickFloatingButtonPosition(moduleId: String): QuickFloatingButtonPosition? =
-        quickFloatingButtonPositions[moduleId]
+    fun quickShortcutPosition(moduleId: String): ShortcutPosition? =
+        quickShortcutPositions[moduleId]
 
-    fun moveQuickFloatingButton(
+    fun moveQuickShortcut(
         moduleId: String,
         deltaX: Float,
         deltaY: Float,
         travelWidth: Float,
         travelHeight: Float,
-        defaultPosition: QuickFloatingButtonPosition
+        defaultPosition: ShortcutPosition
     ) {
-        val current = quickFloatingButtonPositions[moduleId] ?: defaultPosition
-        quickFloatingButtonPositions[moduleId] = QuickFloatingButtonPosition(
+        val current = quickShortcutPositions[moduleId] ?: defaultPosition
+        quickShortcutPositions[moduleId] = ShortcutPosition(
             xFraction = if (travelWidth > 0f) {
                 (current.xFraction + deltaX / travelWidth).coerceIn(0f, 1f)
             } else {
@@ -218,7 +256,7 @@ class ClickGuiState(
         )
     }
 
-    fun openPanelButtonPosition(): QuickFloatingButtonPosition = openPanelButtonPosition
+    fun openPanelButtonPosition(): ShortcutPosition = openPanelButtonPosition
 
     fun moveOpenPanelButton(
         deltaX: Float,
@@ -226,7 +264,7 @@ class ClickGuiState(
         travelWidth: Float,
         travelHeight: Float
     ) {
-        openPanelButtonPosition = QuickFloatingButtonPosition(
+        openPanelButtonPosition = ShortcutPosition(
             xFraction = if (travelWidth > 0f) {
                 (openPanelButtonPosition.xFraction + deltaX / travelWidth).coerceIn(0f, 1f)
             } else {
@@ -318,9 +356,10 @@ class ClickGuiState(
         toggleValues = toggleValues.toMap(),
         sliderValues = sliderValues.toMap(),
         choiceValues = choiceValues.toMap(),
-        quickFloatingButtonValues = quickFloatingButtonValues.toMap(),
-        quickFloatingButtonPositions = quickFloatingButtonPositions.toMap(),
-        openPanelButtonPosition = openPanelButtonPosition
+        quickShortcutValues = quickShortcutValues.toMap(),
+        quickShortcutPositions = quickShortcutPositions.toMap(),
+        openPanelButtonPosition = openPanelButtonPosition,
+        keybinds = keybinds.toMap()
     )
 
     private fun applySnapshot(snapshot: ConfigSnapshot) {
@@ -337,11 +376,13 @@ class ClickGuiState(
         sliderValues.putAll(snapshot.sliderValues)
         choiceValues.clear()
         choiceValues.putAll(snapshot.choiceValues)
-        quickFloatingButtonValues.clear()
-        quickFloatingButtonValues.putAll(snapshot.quickFloatingButtonValues)
-        quickFloatingButtonPositions.clear()
-        quickFloatingButtonPositions.putAll(snapshot.quickFloatingButtonPositions)
+        quickShortcutValues.clear()
+        quickShortcutValues.putAll(snapshot.quickShortcutValues)
+        quickShortcutPositions.clear()
+        quickShortcutPositions.putAll(snapshot.quickShortcutPositions)
         openPanelButtonPosition = snapshot.openPanelButtonPosition
+        keybinds.clear()
+        keybinds.putAll(snapshot.keybinds)
     }
 
     /** Manual theme choices and the system palette are mutually exclusive. */
@@ -364,12 +405,12 @@ class ClickGuiState(
         private const val ThemeSwatchCount = 4
         private const val LanguageCount = 2
         private const val DemoAccountExpiryText = "Expires 2026-12-31"
-        private const val FloatingButtonModuleId = "misc.floatingbutton"
-        private const val FloatingButtonStyleLabel = "Style"
-        private const val FloatingButtonSizeLabel = "Size"
-        private const val FloatingButtonCornerRadiusLabel = "Corner radius"
-        private const val DefaultFloatingButtonSize = 32f
-        private const val DefaultFloatingButtonCornerRadius = 10f
+        private const val ShortcutModuleId = "misc.shortcut"
+        private const val ShortcutStyleLabel = "Style"
+        private const val ShortcutSizeLabel = "Size"
+        private const val ShortcutCornerRadiusLabel = "Corner radius"
+        private const val DefaultShortcutSize = 32f
+        private const val DefaultShortcutCornerRadius = 10f
         private fun settingKey(moduleId: String, label: String) = "$moduleId/$label"
 
         /** Encodes every map as a "key=value" line list of strings so the whole state is Bundle-safe. */
@@ -382,8 +423,8 @@ class ClickGuiState(
                     encode(state.toggleValues) { if (it) "1" else "0" },
                     encode(state.sliderValues) { it.toString() },
                     encode(state.choiceValues) { it.toString() },
-                    encode(state.quickFloatingButtonValues) { if (it) "1" else "0" },
-                    encode(state.quickFloatingButtonPositions) { "${it.xFraction},${it.yFraction}" },
+                    encode(state.quickShortcutValues) { if (it) "1" else "0" },
+                    encode(state.quickShortcutPositions) { "${it.xFraction},${it.yFraction}" },
                     state.selectedModuleId.orEmpty(),
                     if (state.isDetailsPanelOpen) "1" else "0",
                     if (state.isWindowOpen) "1" else "0",
@@ -396,7 +437,9 @@ class ClickGuiState(
                     "${state.openPanelButtonPosition.xFraction},${state.openPanelButtonPosition.yFraction}",
                     state.languageIndex.toString(),
                     encodeConfigs(state.configurations),
-                    state.nextConfigId.toString()
+                    state.nextConfigId.toString(),
+                    // Appended last: the indices above are positional and older saves must keep working.
+                    encodeKeybinds(state.keybinds)
                 )
             },
             restore = { values ->
@@ -410,8 +453,8 @@ class ClickGuiState(
                         decodeInto(values[4], sliderValues) { it.toFloat() }
                         decodeInto(values[5], choiceValues) { it.toInt() }
                         if (values.size >= 17) {
-                            decodeInto(values[6], quickFloatingButtonValues) { it == "1" }
-                            decodePositions(values[7], quickFloatingButtonPositions)
+                            decodeInto(values[6], quickShortcutValues) { it == "1" }
+                            decodePositions(values[7], quickShortcutPositions)
                         }
                         val baseIndex = if (values.size >= 17) 8 else 6
                         selectedModuleId = values[baseIndex].takeIf { it.isNotEmpty() }
@@ -429,6 +472,7 @@ class ClickGuiState(
                         languageIndex = values.getOrNull(18)?.toIntOrNull()?.coerceIn(0, LanguageCount - 1) ?: 0
                         configs.addAll(decodeConfigs(values.getOrNull(19).orEmpty()))
                         nextConfigId = values.getOrNull(20)?.toIntOrNull() ?: configs.size
+                        decodeKeybinds(values.getOrNull(21).orEmpty(), keybinds)
                     } else {
                         // The previous saver stored expanded card ids at index 3.
                         decodeInto(values[4], toggleValues) { it == "1" }
@@ -450,7 +494,7 @@ class ClickGuiState(
             }
         }
 
-        private fun decodePositions(encoded: String, into: MutableMap<String, QuickFloatingButtonPosition>) {
+        private fun decodePositions(encoded: String, into: MutableMap<String, ShortcutPosition>) {
             if (encoded.isEmpty()) return
             encoded.split("\n").forEach { entry ->
                 val separator = entry.lastIndexOf('=')
@@ -459,7 +503,7 @@ class ClickGuiState(
                 val x = values.getOrNull(0)?.toFloatOrNull()
                 val y = values.getOrNull(1)?.toFloatOrNull()
                 if (x != null && y != null) {
-                    into[entry.substring(0, separator)] = QuickFloatingButtonPosition(
+                    into[entry.substring(0, separator)] = ShortcutPosition(
                         xFraction = x.coerceIn(0f, 1f),
                         yFraction = y.coerceIn(0f, 1f)
                     )
@@ -467,11 +511,11 @@ class ClickGuiState(
             }
         }
 
-        private fun decodePosition(encoded: String?): QuickFloatingButtonPosition? {
+        private fun decodePosition(encoded: String?): ShortcutPosition? {
             val values = encoded?.split(',') ?: return null
             val x = values.getOrNull(0)?.toFloatOrNull() ?: return null
             val y = values.getOrNull(1)?.toFloatOrNull() ?: return null
-            return QuickFloatingButtonPosition(
+            return ShortcutPosition(
                 xFraction = x.coerceIn(0f, 1f),
                 yFraction = y.coerceIn(0f, 1f)
             )
@@ -482,6 +526,29 @@ class ClickGuiState(
 
         private fun decodeText(value: String): String =
             runCatching { String(Base64.getDecoder().decode(value), Charsets.UTF_8) }.getOrDefault("")
+
+        /**
+         * `moduleId=keyCode,isGamepad,base64(label)` per line.
+         *
+         * The label is Base64-encoded so a name containing `,` or `=` cannot split the record.
+         */
+        private fun encodeKeybinds(map: Map<String, ModuleKeybind>): String =
+            map.entries.joinToString("\n") { (moduleId, bind) ->
+                "$moduleId=${bind.keyCode},${if (bind.isGamepad) 1 else 0},${encodeText(bind.label)}"
+            }
+
+        private fun decodeKeybinds(encoded: String, into: MutableMap<String, ModuleKeybind>) {
+            if (encoded.isEmpty()) return
+            encoded.split("\n").forEach { entry ->
+                val separator = entry.lastIndexOf('=')
+                if (separator <= 0) return@forEach
+                val parts = entry.substring(separator + 1).split(',')
+                val keyCode = parts.getOrNull(0)?.toIntOrNull() ?: return@forEach
+                val isGamepad = parts.getOrNull(1) == "1"
+                val label = decodeText(parts.getOrNull(2).orEmpty()).ifEmpty { keyLabel(keyCode) }
+                into[entry.substring(0, separator)] = ModuleKeybind(keyCode, isGamepad, label)
+            }
+        }
 
         private fun encodeConfigs(configs: List<GuiConfig>): String = configs.joinToString("\n") { config ->
             val snapshot = config.snapshot
@@ -497,9 +564,10 @@ class ClickGuiState(
                 encode(snapshot.toggleValues) { if (it) "1" else "0" },
                 encode(snapshot.sliderValues) { it.toString() },
                 encode(snapshot.choiceValues) { it.toString() },
-                encode(snapshot.quickFloatingButtonValues) { if (it) "1" else "0" },
-                encode(snapshot.quickFloatingButtonPositions) { "${it.xFraction},${it.yFraction}" },
-                "${snapshot.openPanelButtonPosition.xFraction},${snapshot.openPanelButtonPosition.yFraction}"
+                encode(snapshot.quickShortcutValues) { if (it) "1" else "0" },
+                encode(snapshot.quickShortcutPositions) { "${it.xFraction},${it.yFraction}" },
+                "${snapshot.openPanelButtonPosition.xFraction},${snapshot.openPanelButtonPosition.yFraction}",
+                encodeKeybinds(snapshot.keybinds)
             ).joinToString("|") { encodeText(it) }
         }
 
@@ -513,13 +581,15 @@ class ClickGuiState(
                 val sliders = mutableMapOf<String, Float>()
                 val choices = mutableMapOf<String, Int>()
                 val quickValues = mutableMapOf<String, Boolean>()
-                val quickPositions = mutableMapOf<String, QuickFloatingButtonPosition>()
+                val quickPositions = mutableMapOf<String, ShortcutPosition>()
+                val configKeybinds = mutableMapOf<String, ModuleKeybind>()
                 decodeInto(fields[7], enabled) { it == "1" }
                 decodeInto(fields[8], toggles) { it == "1" }
                 decodeInto(fields[9], sliders) { it.toFloat() }
                 decodeInto(fields[10], choices) { it.toInt() }
                 decodeInto(fields[11], quickValues) { it == "1" }
                 decodePositions(fields[12], quickPositions)
+                decodeKeybinds(fields.getOrNull(14).orEmpty(), configKeybinds)
                 GuiConfig(
                     id = fields[0],
                     name = fields[1],
@@ -533,10 +603,11 @@ class ClickGuiState(
                         toggleValues = toggles,
                         sliderValues = sliders,
                         choiceValues = choices,
-                        quickFloatingButtonValues = quickValues,
-                        quickFloatingButtonPositions = quickPositions,
+                        quickShortcutValues = quickValues,
+                        quickShortcutPositions = quickPositions,
                         openPanelButtonPosition = decodePosition(fields[13])
-                            ?: QuickFloatingButtonPosition(0.5f, 0.5f)
+                            ?: ShortcutPosition(0.5f, 0.5f),
+                        keybinds = configKeybinds
                     )
                 )
             }
@@ -544,7 +615,7 @@ class ClickGuiState(
     }
 }
 
-data class QuickFloatingButtonPosition(
+data class ShortcutPosition(
     val xFraction: Float,
     val yFraction: Float
 )

@@ -3,6 +3,7 @@ package com.example.md3clickgui.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.selection.toggleable
@@ -59,6 +60,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -69,6 +72,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import android.view.KeyEvent as AndroidKeyCodes
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntSize
@@ -93,15 +102,18 @@ import com.example.md3clickgui.ui.language.uiText
 import kotlinx.coroutines.launch
 import java.util.Locale
 import android.graphics.Color as AndroidColor
-import com.example.md3clickgui.ui.theme.colorSpring
-
+import androidx.compose.material3.TextButton
+import com.example.md3clickgui.ui.model.ModuleKeybind
+import com.example.md3clickgui.ui.model.isGamepadKey
+import com.example.md3clickgui.ui.model.keyLabel
+import androidx.compose.runtime.LaunchedEffect
 /** A fixed-height module row with explicit selection and a separate enable control. */
 @Composable
 internal fun ModuleCard(module: GuiModule, state: ClickGuiState, languageIndex: Int = 0, categoryName: String = "", selection: SlidingSelection) {
     val colors = MaterialTheme.colorScheme
     val selected = state.isDetailsPanelOpen && state.selectedModuleId == module.id
     // Direct response to a tap, so it uses the short feedback tier rather than the transition one.
-    val foreground by animateColorAsState(if (selected) colors.onPrimaryContainer else colors.onSurface, colorSpring(), label = "moduleTextColor")
+    val foreground by animateColorAsState(if (selected) colors.onPrimaryContainer else colors.onSurface, NexusMotion.colorSpec(), label = "moduleTextColor")
     Surface(
         onClick = { state.selectModule(module.id) },
         enabled = state.canInteractWithModules(),
@@ -135,13 +147,13 @@ internal fun ModuleCard(module: GuiModule, state: ClickGuiState, languageIndex: 
 }
 
 /**
- * Cards whose switch would be meaningless. Theme / Language / FloatingButton are app-level settings
+ * Cards whose switch would be meaningless. Theme / Language / ShortcutButton are app-level settings
  * the card itself edits, and [ModuleBinding.Content] cards (music) only open a panel — none of them
  * has an off state, so the list must not offer a switch for them.
  */
 private fun GuiModule.hasEnableSwitch(): Boolean = when (binding) {
     ModuleBinding.Standard, ModuleBinding.DarkMode, ModuleBinding.DynamicColor -> true
-    ModuleBinding.Theme, ModuleBinding.Language, ModuleBinding.FloatingButton, ModuleBinding.Content -> false
+    ModuleBinding.Theme, ModuleBinding.Language, ModuleBinding.ShortcutButton, ModuleBinding.Content -> false
 }
 
 /** Each setting uses the same label column and control column. */
@@ -174,17 +186,19 @@ fun ModuleSettingsPanel(
                     }
                     if (module.hasEnableSwitch()) {
                         Row(Modifier.fillMaxWidth().heightIn(min = NexusDimensions.settingRow), verticalAlignment = Alignment.CenterVertically) {
-                            Text(uiText(languageIndex, "Floating Button"), modifier = Modifier.weight(1f),
+                            Text(uiText(languageIndex, "Shortcut"), modifier = Modifier.weight(1f),
                                 style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
                             CompactSegmentedControl(
                                 options = listOf(uiText(languageIndex, "Off"), uiText(languageIndex, "On")),
-                                selectedIndex = if (state.isQuickFloatingButtonEnabled(module)) 1 else 0,
-                                onSelect = { state.setQuickFloatingButtonEnabled(module, it == 1) },
-                                label = uiText(languageIndex, "Floating Button"), modifier = Modifier.width(112.dp)
+                                selectedIndex = if (state.isQuickShortcutEnabled(module)) 1 else 0,
+                                onSelect = { state.setQuickShortcutEnabled(module, it == 1) },
+                                label = uiText(languageIndex, "Shortcut"), modifier = Modifier.width(112.dp)
                             )
                             Spacer(Modifier.width(NexusSpacing.small))
                         }
                     }
+                    // Sits beside the shortcut switch: a module can have a floating button, a key, or both.
+                    KeybindRow(module, state, languageIndex)
                 }
             }
             Spacer(Modifier.height(NexusDimensions.rowGap))
@@ -200,6 +214,81 @@ fun ModuleSettingsPanel(
     }
 }
 
+/**
+ * Binds a physical button to a module.
+ *
+ * The two ways to reach a module from outside the panel sit next to each other: the Shortcut switch
+ * above creates a floating button, this row binds a key. They are independent, so a module may have
+ * either, both, or neither.
+ *
+ * While listening, the row takes focus and swallows the next key press. `onPreviewKeyEvent` is used
+ * rather than `onKeyEvent` so the press is consumed before it can also activate a focused button.
+ */
+@Composable
+private fun KeybindRow(module: GuiModule, state: ClickGuiState, languageIndex: Int) {
+    val colors = MaterialTheme.colorScheme
+    val bind = state.keybind(module)
+    var listening by remember(module.id) { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    if (listening) {
+        LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    }
+    SettingRow(uiText(languageIndex, "Keybind")) {
+        if (listening) {
+            // Clicking the prompt cancels, so there is a way out without owning a keyboard.
+            Surface(
+                onClick = { listening = false },
+                shape = NexusIconShape,
+                color = colors.primaryContainer,
+                contentColor = colors.onPrimaryContainer,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester)
+                    .focusable()
+                    .onPreviewKeyEvent { event ->
+                        if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                        // Key.keyCode is the Android key code held as a Long; ModuleKeybind stores an Int.
+                        val code = event.key.keyCode.toInt()
+                        // Escape and Back abandon the capture instead of binding themselves.
+                        if (code == AndroidKeyCodes.KEYCODE_ESCAPE || code == AndroidKeyCodes.KEYCODE_BACK) {
+                            listening = false
+                        } else {
+                            state.bindKey(module, ModuleKeybind(code, isGamepadKey(code), keyLabel(code)))
+                            listening = false
+                        }
+                        true
+                    }
+            ) {
+                Text(uiText(languageIndex, "Press a button"), Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    style = MaterialTheme.typography.labelMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        } else {
+            Text(
+                text = bind?.label ?: uiText(languageIndex, "None"),
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (bind == null) colors.onSurfaceVariant else colors.primary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.width(NexusSpacing.small))
+            if (bind != null) {
+                TextButton(onClick = { state.clearKeybind(module) }) {
+                    Text(uiText(languageIndex, "Clear"), style = MaterialTheme.typography.labelMedium)
+                }
+            }
+            TextButton(
+                onClick = { listening = true },
+                enabled = state.canInteractWithModules()
+            ) {
+                Text(
+                    uiText(languageIndex, if (bind == null) "Bind" else "Change"),
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun AccessibleSwitch(
     label: String,
@@ -208,9 +297,9 @@ private fun AccessibleSwitch(
     enabled: Boolean = true
 ) {
     val colors = MaterialTheme.colorScheme
-    val progress by animateFloatAsState(if (checked) 1f else 0f, MaterialTheme.motionScheme.fastSpatialSpec<Float>(), label = "switchThumbSlide")
-    val track by animateColorAsState(if (checked) colors.primary else colors.surfaceContainerHighest, colorSpring(), label = "switchTrack")
-    val thumb by animateColorAsState(if (checked) colors.onPrimary else colors.onSurfaceVariant, colorSpring(), label = "switchThumb")
+    val progress by animateFloatAsState(if (checked) 1f else 0f, NexusMotion.feedbackSpec<Float>(), label = "switchThumbSlide")
+    val track by animateColorAsState(if (checked) colors.primary else colors.surfaceContainerHighest, NexusMotion.colorSpec(), label = "switchTrack")
+    val thumb by animateColorAsState(if (checked) colors.onPrimary else colors.onSurfaceVariant, NexusMotion.colorSpec(), label = "switchThumb")
     val interactions = remember { MutableInteractionSource() }
     val focused by interactions.collectIsFocusedAsState()
     Box(

@@ -9,15 +9,15 @@ import com.example.md3clickgui.ui.modules.ModuleDefinition
 import com.example.md3clickgui.ui.modules.SectionIds
 
 /** Global style and size for the per-module floating shortcuts, exposed in Misc. */
-object FloatingButtonModule : ModuleDefinition {
-    private const val ID = "misc.floatingbutton"
+object ShortcutModule : ModuleDefinition {
+    private const val ID = "misc.shortcut"
 
     override val sectionId = SectionIds.MISC
     override val model = GuiModule(
         id = ID,
-        name = "Floating button",
+        name = "Shortcut",
         icon = Icons.Default.AutoAwesome,
-        binding = ModuleBinding.FloatingButton,
+        binding = ModuleBinding.ShortcutButton,
         settings = listOf(
             ModuleSetting.Choice("Style", listOf("Icon", "Text", "Icon + text")),
             ModuleSetting.Slider("Size", defaultValue = 32f, valueRange = 24f..48f, suffix = "dp", decimalPlaces = 0),

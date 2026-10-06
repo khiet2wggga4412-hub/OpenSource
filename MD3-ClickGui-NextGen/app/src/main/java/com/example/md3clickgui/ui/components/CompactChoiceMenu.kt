@@ -160,10 +160,10 @@ internal fun CompactChoiceMenu(
             ) {
                 AnimatedVisibility(
                     visibleState = visibility,
-                    enter = expandVertically(MaterialTheme.motionScheme.defaultSpatialSpec<IntSize>(), expandFrom = if (opensAbove) Alignment.Bottom else Alignment.Top) +
-                        fadeIn(MaterialTheme.motionScheme.defaultSpatialSpec<Float>()),
-                    exit = shrinkVertically(MaterialTheme.motionScheme.defaultSpatialSpec<IntSize>(), shrinkTowards = if (opensAbove) Alignment.Bottom else Alignment.Top) +
-                        fadeOut(MaterialTheme.motionScheme.defaultSpatialSpec<Float>())
+                    enter = expandVertically(NexusMotion.enterSpec<IntSize>(), expandFrom = if (opensAbove) Alignment.Bottom else Alignment.Top) +
+                        fadeIn(NexusMotion.enterSpec<Float>()),
+                    exit = shrinkVertically(NexusMotion.exitSpec<IntSize>(), shrinkTowards = if (opensAbove) Alignment.Bottom else Alignment.Top) +
+                        fadeOut(NexusMotion.exitSpec<Float>())
                 ) {
                     Surface(
                         modifier = Modifier.width(menuWidth).heightIn(max = maximumHeight)

@@ -35,28 +35,26 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.md3clickgui.ui.language.uiText
-import com.example.md3clickgui.ui.model.FloatingButtonStyle
+import com.example.md3clickgui.ui.model.ShortcutStyle
 import com.example.md3clickgui.ui.model.GuiModule
 import com.example.md3clickgui.ui.state.ClickGuiState
-import com.example.md3clickgui.ui.state.QuickFloatingButtonPosition
+import com.example.md3clickgui.ui.state.ShortcutPosition
 import com.example.md3clickgui.ui.theme.NexusDimensions
 import com.example.md3clickgui.ui.theme.NexusSpacing
 import kotlin.math.roundToInt
-import com.example.md3clickgui.ui.theme.colorSpring
 
 /** Renders enabled module shortcuts above the collapsed window state. */
 @Composable
-fun QuickFloatingButtonLayer(
+fun ShortcutLayer(
     modules: List<GuiModule>,
     state: ClickGuiState,
     modifier: Modifier = Modifier
 ) {
-    val visibleModules = modules.filter { state.isQuickFloatingButtonEnabled(it) }
+    val visibleModules = modules.filter { state.isQuickShortcutEnabled(it) }
     val isVisible = state.canInteractWithModules() && !state.isWindowOpen && visibleModules.isNotEmpty()
     val shortcutAlpha by animateFloatAsState(
         targetValue = if (isVisible) 1f else 0f,
-        // Effects token: this animates alpha, not position.
-        animationSpec = MaterialTheme.motionScheme.defaultEffectsSpec(),
+        animationSpec = NexusMotion.enterSpec<Float>(),
         label = "quickButtonLayerAlpha"
     )
 
@@ -66,15 +64,15 @@ fun QuickFloatingButtonLayer(
         modifier = modifier.graphicsLayer { alpha = shortcutAlpha }
     ) {
             val density = LocalDensity.current
-            val touchTargetPx = with(density) { NexusDimensions.quickFloatingButtonTouchTarget.toPx() }
+            val touchTargetPx = with(density) { NexusDimensions.quickShortcutTouchTarget.toPx() }
             val travelWidth = (constraints.maxWidth - touchTargetPx).coerceAtLeast(0f)
             val travelHeight = (constraints.maxHeight - touchTargetPx).coerceAtLeast(0f)
             val stackStepPx = with(density) {
-                (NexusDimensions.quickFloatingButtonTouchTarget + NexusSpacing.small).toPx()
+                (NexusDimensions.quickShortcutTouchTarget + NexusSpacing.small).toPx()
             }
 
             visibleModules.forEachIndexed { index, module ->
-                val defaultPosition = QuickFloatingButtonPosition(
+                val defaultPosition = ShortcutPosition(
                     xFraction = 1f,
                     yFraction = if (travelHeight > 0f) {
                         (1f - ((index + 1) * stackStepPx / travelHeight)).coerceIn(0f, 1f)
@@ -82,7 +80,7 @@ fun QuickFloatingButtonLayer(
                         0f
                     }
                 )
-                val position = state.quickFloatingButtonPosition(module.id) ?: defaultPosition
+                val position = state.quickShortcutPosition(module.id) ?: defaultPosition
                 Box(
                     modifier = Modifier
                         .offset {
@@ -93,13 +91,13 @@ fun QuickFloatingButtonLayer(
                         }
                         .align(Alignment.TopStart)
                 ) {
-                        QuickFloatingButton(
+                        QuickShortcut(
                             module = module,
                             state = state,
                             enabled = isVisible,
                             onClick = { state.toggle(module) },
                         onDrag = { delta ->
-                            state.moveQuickFloatingButton(
+                            state.moveQuickShortcut(
                                 moduleId = module.id,
                                 deltaX = delta.x,
                                 deltaY = delta.y,
@@ -118,7 +116,7 @@ fun QuickFloatingButtonLayer(
 private const val MaterialLabel = "Material"
 
 @Composable
-private fun QuickFloatingButton(
+private fun QuickShortcut(
     module: GuiModule,
     state: ClickGuiState,
     enabled: Boolean,
@@ -127,9 +125,9 @@ private fun QuickFloatingButton(
 ) {
     val colors = MaterialTheme.colorScheme
     val isChecked = state.isChecked(module)
-    val style = state.floatingButtonStyle()
-    val buttonSize = state.floatingButtonSize().dp
-    val cornerRadius = state.floatingButtonCornerRadius().dp
+    val style = state.shortcutStyle()
+    val buttonSize = state.shortcutSize().dp
+    val cornerRadius = state.shortcutCornerRadius().dp
     val glyphSize = buttonSize * 0.625f
     val labelFontSize = (buttonSize.value * 0.375f).sp
     val labelStyle = MaterialTheme.typography.labelMedium.copy(
@@ -138,19 +136,19 @@ private fun QuickFloatingButton(
     )
     val containerColor by animateColorAsState(
         targetValue = if (isChecked) colors.primary else colors.primaryContainer,
-        animationSpec = colorSpring(),
+        animationSpec = NexusMotion.colorSpec(),
         label = "quickButtonContainerColor"
     )
     val contentColor by animateColorAsState(
         targetValue = if (isChecked) colors.onPrimary else colors.onPrimaryContainer,
-        animationSpec = colorSpring(),
+        animationSpec = NexusMotion.colorSpec(),
         label = "quickButtonContentColor"
     )
     Box(
         modifier = Modifier
             .defaultMinSize(
-                minWidth = NexusDimensions.quickFloatingButtonTouchTarget,
-                minHeight = NexusDimensions.quickFloatingButtonTouchTarget
+                minWidth = NexusDimensions.quickShortcutTouchTarget,
+                minHeight = NexusDimensions.quickShortcutTouchTarget
             )
             .pointerInput(module.id, enabled) {
                 if (enabled) {
@@ -172,7 +170,7 @@ private fun QuickFloatingButton(
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            modifier = if (style == FloatingButtonStyle.Icon) {
+            modifier = if (style == ShortcutStyle.Icon) {
                 Modifier.size(buttonSize)
             } else {
                 Modifier.defaultMinSize(minWidth = buttonSize)
@@ -184,14 +182,14 @@ private fun QuickFloatingButton(
             tonalElevation = 0.dp
         ) {
             when (style) {
-                FloatingButtonStyle.Icon -> Box(contentAlignment = Alignment.Center) {
+                ShortcutStyle.Icon -> Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = module.icon,
                         contentDescription = "Toggle ${module.name}",
                         modifier = Modifier.size(glyphSize)
                     )
                 }
-                FloatingButtonStyle.Text -> Box(
+                ShortcutStyle.Text -> Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.padding(horizontal = buttonSize * 0.375f, vertical = buttonSize * 0.25f)
                 ) {
@@ -201,7 +199,7 @@ private fun QuickFloatingButton(
                         maxLines = 1
                     )
                 }
-                FloatingButtonStyle.IconText -> Row(
+                ShortcutStyle.IconText -> Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(buttonSize * 0.25f),
                     modifier = Modifier.padding(horizontal = buttonSize * 0.375f, vertical = buttonSize * 0.25f)
@@ -225,16 +223,16 @@ private fun QuickFloatingButton(
 
 /** The collapsed-window control, positioned independently from the scaled panel. */
 @Composable
-fun OpenPanelFloatingButton(
+fun OpenPanelButton(
     state: ClickGuiState,
     travelWidth: Float,
     travelHeight: Float,
     modifier: Modifier = Modifier
 ) {
     val position = state.openPanelButtonPosition()
-    val style = state.floatingButtonStyle()
-    val buttonSize = state.floatingButtonSize().dp
-    val cornerRadius = state.floatingButtonCornerRadius().dp
+    val style = state.shortcutStyle()
+    val buttonSize = state.shortcutSize().dp
+    val cornerRadius = state.shortcutCornerRadius().dp
     val glyphSize = buttonSize * 0.625f
     val labelFontSize = (buttonSize.value * 0.375f).sp
     val labelStyle = MaterialTheme.typography.labelMedium.copy(
@@ -250,8 +248,8 @@ fun OpenPanelFloatingButton(
                 )
             }
             .defaultMinSize(
-                minWidth = NexusDimensions.quickFloatingButtonTouchTarget,
-                minHeight = NexusDimensions.quickFloatingButtonTouchTarget
+                minWidth = NexusDimensions.quickShortcutTouchTarget,
+                minHeight = NexusDimensions.quickShortcutTouchTarget
             )
             .pointerInput(Unit) {
                 detectDragGesturesAfterLongPress(
@@ -275,7 +273,7 @@ fun OpenPanelFloatingButton(
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            modifier = if (style == FloatingButtonStyle.Icon) {
+            modifier = if (style == ShortcutStyle.Icon) {
                 Modifier.size(buttonSize)
             } else {
                 Modifier.defaultMinSize(minWidth = buttonSize)
@@ -287,14 +285,14 @@ fun OpenPanelFloatingButton(
             tonalElevation = 0.dp
         ) {
             when (style) {
-                FloatingButtonStyle.Icon -> Box(contentAlignment = Alignment.Center) {
+                ShortcutStyle.Icon -> Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.AutoAwesome,
                         contentDescription = MaterialLabel,
                         modifier = Modifier.size(glyphSize)
                     )
                 }
-                FloatingButtonStyle.Text -> Box(
+                ShortcutStyle.Text -> Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.padding(horizontal = buttonSize * 0.375f, vertical = buttonSize * 0.25f)
                 ) {
@@ -304,7 +302,7 @@ fun OpenPanelFloatingButton(
                         maxLines = 1
                     )
                 }
-                FloatingButtonStyle.IconText -> Row(
+                ShortcutStyle.IconText -> Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(buttonSize * 0.25f),
                     modifier = Modifier.padding(horizontal = buttonSize * 0.375f, vertical = buttonSize * 0.25f)
