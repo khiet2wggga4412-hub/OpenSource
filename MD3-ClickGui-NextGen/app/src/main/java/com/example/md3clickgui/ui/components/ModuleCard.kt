@@ -184,21 +184,6 @@ fun ModuleSettingsPanel(
                             Icon(Icons.Default.Close, contentDescription = uiText(languageIndex, ClosePanelLabel), modifier = Modifier.size(16.dp))
                         }
                     }
-                    if (module.hasEnableSwitch()) {
-                        Row(Modifier.fillMaxWidth().heightIn(min = NexusDimensions.settingRow), verticalAlignment = Alignment.CenterVertically) {
-                            Text(uiText(languageIndex, "Shortcut"), modifier = Modifier.weight(1f),
-                                style = MaterialTheme.typography.bodyMedium, color = colors.onSurfaceVariant)
-                            CompactSegmentedControl(
-                                options = listOf(uiText(languageIndex, "Off"), uiText(languageIndex, "On")),
-                                selectedIndex = if (state.isQuickShortcutEnabled(module)) 1 else 0,
-                                onSelect = { state.setQuickShortcutEnabled(module, it == 1) },
-                                label = uiText(languageIndex, "Shortcut"), modifier = Modifier.width(112.dp)
-                            )
-                            Spacer(Modifier.width(NexusSpacing.small))
-                        }
-                    }
-                    // Sits beside the shortcut switch: a module can have a floating button, a key, or both.
-                    KeybindRow(module, state, languageIndex)
                 }
             }
             Spacer(Modifier.height(NexusDimensions.rowGap))
@@ -208,6 +193,12 @@ fun ModuleSettingsPanel(
                     verticalArrangement = Arrangement.spacedBy(NexusDimensions.rowGap)
                 ) {
                     module.settings.forEach { setting -> ModuleSettingControl(module, setting, state, languageIndex) }
+                    // The two ways to reach a module sit at the end of the list, each in its own card
+                    // like every other setting. The switch toggle only applies where a switch exists.
+                    if (module.hasEnableSwitch()) {
+                        ModuleSettingControl(module, ModuleSetting.Shortcut, state, languageIndex)
+                    }
+                    ModuleSettingControl(module, ModuleSetting.Keybind, state, languageIndex)
                 }
             }
         }
@@ -215,17 +206,17 @@ fun ModuleSettingsPanel(
 }
 
 /**
- * Binds a physical button to a module.
+ * Binds a physical button to a module, in its own settings card.
  *
- * The two ways to reach a module from outside the panel sit next to each other: the Shortcut switch
- * above creates a floating button, this row binds a key. They are independent, so a module may have
- * either, both, or neither.
+ * A module has two independent ways to be reached from outside the panel: the Shortcut card above
+ * creates a floating button, this card binds a key. A module may have either, both, or neither.
  *
- * While listening, the row takes focus and swallows the next key press. `onPreviewKeyEvent` is used
- * rather than `onKeyEvent` so the press is consumed before it can also activate a focused button.
+ * While listening, the prompt takes focus and swallows the next key press. `onPreviewKeyEvent` is
+ * used rather than `onKeyEvent` so the press is consumed before it can also activate a focused
+ * button.
  */
 @Composable
-private fun KeybindRow(module: GuiModule, state: ClickGuiState, languageIndex: Int) {
+private fun KeybindCard(module: GuiModule, state: ClickGuiState, languageIndex: Int) {
     val colors = MaterialTheme.colorScheme
     val bind = state.keybind(module)
     var listening by remember(module.id) { mutableStateOf(false) }
@@ -396,6 +387,16 @@ private fun ModuleSettingControl(module: GuiModule, setting: ModuleSetting, stat
                 onCheckedChange = { state.setToggleValue(module, setting, it) }
             )
         }
+        is ModuleSetting.Shortcut -> SettingRow(uiText(languageIndex, "Shortcut")) {
+            CompactSegmentedControl(
+                options = listOf(uiText(languageIndex, "Off"), uiText(languageIndex, "On")),
+                selectedIndex = if (state.isQuickShortcutEnabled(module)) 1 else 0,
+                onSelect = { state.setQuickShortcutEnabled(module, it == 1) },
+                label = uiText(languageIndex, "Shortcut"),
+                modifier = Modifier.widthIn(max = 112.dp).fillMaxWidth()
+            )
+        }
+        is ModuleSetting.Keybind -> KeybindCard(module, state, languageIndex)
     }
 }
 

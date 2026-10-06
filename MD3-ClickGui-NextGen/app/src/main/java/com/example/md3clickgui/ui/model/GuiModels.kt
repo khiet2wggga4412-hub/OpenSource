@@ -17,6 +17,17 @@ sealed interface ModuleSetting {
     ) : ModuleSetting
     data class Choice(val label: String, val options: List<String>, val defaultIndex: Int = 0) : ModuleSetting
     data class ColorPicker(val label: String, val defaultColorHex: String = "#176B60") : ModuleSetting
+
+    /**
+     * Creates the module's floating shortcut button.
+     *
+     * Not declared by any module: the card appends it, so adding a module still needs no wiring and
+     * every card gets the same pair of shortcut settings, each in its own settings card.
+     */
+    data object Shortcut : ModuleSetting
+
+    /** Binds a peripheral button to the module. Appended by the card, like [Shortcut]. */
+    data object Keybind : ModuleSetting
 }
 
 @Immutable
