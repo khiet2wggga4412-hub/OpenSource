@@ -1,6 +1,6 @@
 # OpenSource
 
-Android ClickGUI，Compose UI 实现。
+Android ClickGUI，Compose UI 实现
 
 | 项目 | 技术栈 |
 | --- | --- |
