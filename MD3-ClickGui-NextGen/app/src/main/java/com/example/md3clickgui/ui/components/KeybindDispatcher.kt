@@ -2,11 +2,7 @@ package com.example.md3clickgui.ui.components
 
 import androidx.compose.foundation.focusable
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
@@ -21,22 +17,18 @@ import com.example.md3clickgui.ui.state.ClickGuiState
  * app, which is a platform boundary — intercepting a game's keys would need an Xposed hook or an
  * accessibility service, and this project has neither.
  *
- * The host is made focusable and asked for focus once, because a key event only reaches a composable
- * inside the focus path. `onKeyEvent` is used rather than `onPreviewKeyEvent` so an open dialog or a
- * focused button still gets first refusal on the press.
+ * The host is made focusable so it can take part in the focus path, but it never *requests* focus:
+ * asking for it at composition claimed focus from the login text fields and stopped the keyboard
+ * from opening there. A key event that no focused child consumes still bubbles up to this host, which
+ * is all the dispatcher needs.
  *
  * Auto-repeat is not filtered: Compose exposes no repeat flag on its key event (the underlying
  * `nativeKeyEvent` is restricted to the library), so holding a button down fires repeatedly, which is
  * the usual behaviour for a ClickGUI keybind.
  */
 @Composable
-fun Modifier.dispatchKeybinds(state: ClickGuiState, modules: List<GuiModule>): Modifier {
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        runCatching { focusRequester.requestFocus() }
-    }
-    return this
-        .focusRequester(focusRequester)
+fun Modifier.dispatchKeybinds(state: ClickGuiState, modules: List<GuiModule>): Modifier =
+    this
         .focusable()
         .onKeyEvent { event ->
             if (event.type != KeyEventType.KeyDown) return@onKeyEvent false
@@ -47,4 +39,3 @@ fun Modifier.dispatchKeybinds(state: ClickGuiState, modules: List<GuiModule>): M
             bound.forEach(state::triggerKeybind)
             true
         }
-}
