@@ -1,0 +1,18 @@
+# Normalise line endings so a checkout on any OS produces the same bytes.
+* text=auto eol=lf
+
+# Windows scripts must keep CRLF to stay runnable from cmd.exe and PowerShell.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets: never touch these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.jar binary
+*.keystore binary
+*.jks binary
+*.ttf binary
+*.otf binary

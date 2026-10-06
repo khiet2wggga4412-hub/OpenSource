@@ -1,0 +1,33 @@
+# Gradle / Android build output
+.gradle/
+build/
+app/build/
+.kotlin/
+.gradle-build-home/
+.gradle-temp/
+gradle-sandbox-home/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Local machine configuration: SDK path, signing keys, secrets
+local.properties
+*.jks
+*.keystore
+keystore.properties
+
+# IDE state (the shared parts are re-created by Android Studio on open)
+.idea/
+*.iml
+*.hprof
+
+# Reference material kept outside version control: extracted upstream sources and
+# recorded frames are large and reproducible from the links in docs/
+artifacts/
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Local-only scratch files
+mumu_check.png
